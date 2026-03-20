@@ -34,6 +34,9 @@ fun App() {
             Button(onClick = { showContent = !showContent }) {
                 Text("Click me!")
             }
+            Button(onClick = { showContent = !showContent }) {
+                Text("LukeGay64")
+            }
             AnimatedVisibility(showContent) {
                 val greeting = remember { Greeting().greet() }
                 Column(
