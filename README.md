@@ -3,6 +3,7 @@
  * [Beginner and Intermediate Kotlin Tutorial](https://kotlinlang.org/docs/kotlin-tour-welcome.html)
  * [Kotlin Multiplatform quickstart](https://kotlinlang.org/docs/multiplatform/quickstart.html)
  * [Create a Kotlin Multiplatform App](https://kotlinlang.org/docs/multiplatform/multiplatform-create-first-app.html#write-common-declarations)
+ * [Material Theme](https://developer.android.com/codelabs/basic-android-kotlin-compose-material-theming#1)
 ### Setup
 * Choose and install the IDE. Kotlin Multiplatform is supported in IntelliJ IDEA and Android Studio, so you can use the IDE you prefer.
 
