@@ -7,6 +7,10 @@
 # BlueJ files
 *.ctxt
 
+# Idea folders
+.idea/
+*.iml
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
@@ -25,3 +29,8 @@ replay_pid*
 
 # Kotlin Gradle plugin data, see https://kotlinlang.org/docs/whatsnew20.html#new-directory-for-kotlin-data-in-gradle-projects
 .kotlin/
+
+# Gradle
+.gradle/
+
+.idea/
