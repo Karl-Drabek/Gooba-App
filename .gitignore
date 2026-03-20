@@ -34,3 +34,6 @@ replay_pid*
 .gradle/
 
 .idea/
+
+# SDK path for relative user
+local.properties
