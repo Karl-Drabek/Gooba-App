@@ -23,13 +23,13 @@ import kotlin.time.Clock
  * morning, the afternoon, or they scooped her poop.
  *
  *  @property user the user currently logged in.
- *  @property onSettingsClick settings button is clicked.
- *  @property onHistoryClick history button is clicked.
+ *  @property onOpenSettings settings button is clicked.
+ *  @property onOpenHistory history button is clicked.
  */
 @Composable
 fun MainScreen( user: User,
-    onSettingsClick: () -> Unit,
-    onHistoryClick: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenHistory: () -> Unit,
 ) {
     /** State */
     var morningFoodData: Pair<User, Instant>? by remember { mutableStateOf(null) }
