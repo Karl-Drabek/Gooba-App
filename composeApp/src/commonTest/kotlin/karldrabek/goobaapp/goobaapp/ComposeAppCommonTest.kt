@@ -1,7 +1,6 @@
 package karldrabek.goobaapp.goobaapp
 
 // Imports
-import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
