@@ -26,6 +26,9 @@ kotlin {
     }
 
     sourceSets {
+
+        all { languageSettings.optIn("kotlin.time.ExperimentalTime") }
+
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
@@ -39,6 +42,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1-0.6.x-compat")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

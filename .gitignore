@@ -10,6 +10,7 @@ captures/
 *~
 *.swp
 *.iml
+.idea/
 .idea/caches/
 .idea/libraries/
 .idea/shelf/
@@ -78,3 +79,5 @@ build/
 
 # Local configuration file
 local.properties
+
+.kotlin/
