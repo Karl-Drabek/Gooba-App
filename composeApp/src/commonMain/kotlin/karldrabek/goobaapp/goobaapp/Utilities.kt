@@ -2,6 +2,7 @@ package karldrabek.goobaapp.goobaapp
 
 import kotlinx.datetime.*
 
+// Or something along those lines
 data class serverMessage(
     val user: User,
     val time: Instant = Clock.System.now(),
