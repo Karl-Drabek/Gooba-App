@@ -1,9 +1,13 @@
 ### Resources
 
+ * [Material Theme Builder](https://material-foundation.github.io/material-theme-builder/)
  * [Beginner and Intermediate Kotlin Tutorial](https://kotlinlang.org/docs/kotlin-tour-welcome.html)
  * [Kotlin Multiplatform quickstart](https://kotlinlang.org/docs/multiplatform/quickstart.html)
  * [Create a Kotlin Multiplatform App](https://kotlinlang.org/docs/multiplatform/multiplatform-create-first-app.html#write-common-declarations)
  * [Compose Multiplatform](https://kotlinlang.org/docs/multiplatform/compose-layout.html)
+
+### How to migrate
+ [migration steps](https://kotlinlang.org/docs/multiplatform/multiplatform-project-agp-9-migration.html#enabling-the-legacy-apis-until-agp-10)
 ### Setup
 * Choose and install the IDE. Kotlin Multiplatform is supported in IntelliJ IDEA and Android Studio, so you can use the IDE you prefer.
 
