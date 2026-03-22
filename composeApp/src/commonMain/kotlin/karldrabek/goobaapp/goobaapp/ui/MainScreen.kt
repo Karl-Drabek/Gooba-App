@@ -30,12 +30,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import karldrabek.goobaapp.goobaapp.backend.User
 import karldrabek.goobaapp.goobaapp.ui.theme.MorningBadgeBg
 import karldrabek.goobaapp.goobaapp.ui.theme.MorningBadgeFg
 import kotlinx.datetime.TimeZone
 import karldrabek.goobaapp.goobaapp.backend.formatTime
+import karldrabek.goobaapp.goobaapp.ui.theme.EveningBadgeBg
+import karldrabek.goobaapp.goobaapp.ui.theme.EveningBadgeFg
+import karldrabek.goobaapp.goobaapp.ui.theme.LitterBadgeBg
+import karldrabek.goobaapp.goobaapp.ui.theme.LitterBadgeFg
+import androidx.compose.material.icons.outlined.Edit
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -102,8 +108,8 @@ fun MainScreen(
                 pendingLabel = "Feed Dinner",
                 completeTitle = "Evening - Fed ✓",
                 completeSubtitle = eveningFoodDataSnap?.let { "By ${it.first} at ${formatTime(it.second)}" } ?: "",
-                badgeBackground = MorningBadgeBg,
-                badgeForeground = MorningBadgeFg,
+                badgeBackground = EveningBadgeBg,
+                badgeForeground = EveningBadgeFg,
                 onClick = { eveningFoodData = user to Clock.System.now() },
                 icon = {
                     Icon(
@@ -124,8 +130,8 @@ fun MainScreen(
                 pendingLabel = "Scoop Poop",
                 completeTitle = "Litter box - Done ✓",
                 completeSubtitle = poopScoopDataSnap?.let { "By ${it.first} at ${formatTime(it.second)}" } ?: "",
-                badgeBackground = MorningBadgeBg,
-                badgeForeground = MorningBadgeFg,
+                badgeBackground = LitterBadgeBg,
+                badgeForeground = LitterBadgeFg,
                 onClick = { poopScoopData = user to Clock.System.now() },
                 icon = {
                     Icon(
@@ -271,8 +277,8 @@ private fun StatusRow(
     pendingLabel: String,
     completeTitle: String,
     completeSubtitle: String,
-    badgeBackground: androidx.compose.ui.graphics.Color,
-    badgeForeground: androidx.compose.ui.graphics.Color,
+    badgeBackground: Color,
+    badgeForeground: Color,
     onClick: () -> Unit,
     icon: @Composable () -> Unit
 ) {
@@ -289,12 +295,7 @@ private fun StatusRow(
                 .background(badgeBackground, CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            /** display the icon with a tint applied */
-            Icon(
-                imageVector = Icons.Outlined.WbSunny,
-                contentDescription = null,
-                tint = badgeForeground
-            )
+            icon()
         }
 
         /** no one has completed the task so allow user to complete with a button */
@@ -334,6 +335,12 @@ private fun StatusRow(
                     text = completeSubtitle,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            IconButton(onClick = { }) {
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = "Edit"
                 )
             }
         }

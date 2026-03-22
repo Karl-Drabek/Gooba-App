@@ -50,7 +50,9 @@ fun App() {
                         onOpenSettings = { state = AppState.SETTINGS },
                         onOpenHistory = { state = AppState.HISTORY })
 
-                    AppState.SETTINGS -> SettingsScreen(userSnap) { state = AppState.MAIN_MENU }
+                    AppState.SETTINGS -> SettingsScreen(userSnap) {
+                        state = AppState.MAIN_MENU
+                    }
                     AppState.HISTORY -> HistoryScreen(userSnap) { state = AppState.MAIN_MENU }
                 }
             }
