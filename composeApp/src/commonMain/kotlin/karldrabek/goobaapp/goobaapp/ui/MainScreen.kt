@@ -65,6 +65,9 @@ fun MainScreen(
     var morningFoodData: Pair<User, Instant>? by remember { mutableStateOf(null) }
     var eveningFoodData: Pair<User, Instant>? by remember { mutableStateOf(null) }
     var poopScoopData: Pair<User, Instant>? by remember { mutableStateOf(null) }
+    var editingMorningData: Boolean by remember { mutableStateOf(false) }
+    var editingEveningData: Boolean by remember { mutableStateOf(false) }
+    var editingPoopScoopData: Boolean by remember { mutableStateOf(false) }
 
     /** Make read only so we can verify they are non-null*/
     val morningFoodDataSnap = morningFoodData
@@ -87,12 +90,14 @@ fun MainScreen(
         ) {
             /** morning feeding row */
             StatusRow(
+                isEditing = editingMorningData,
                 isComplete = morningFoodDataSnap != null,
                 pendingLabel = "Feed Breakfast",
                 completeTitle = "Morning - Fed ✓",
                 completeSubtitle = morningFoodDataSnap?.let { "By ${it.first} at ${formatTime(it.second)}" } ?: "",
                 badgeBackground = MorningBadgeBg,
                 badgeForeground = MorningBadgeFg,
+                onEditClick = {editingMorningData = true},
                 onClick = { morningFoodData = user to Clock.System.now() },
                 icon = {
                     Icon(
@@ -104,6 +109,7 @@ fun MainScreen(
 
             /** evening feeding row */
             StatusRow(
+                isEditing = editingEveningData,
                 isComplete = eveningFoodDataSnap != null,
                 pendingLabel = "Feed Dinner",
                 completeTitle = "Evening - Fed ✓",
@@ -111,6 +117,7 @@ fun MainScreen(
                 badgeBackground = EveningBadgeBg,
                 badgeForeground = EveningBadgeFg,
                 onClick = { eveningFoodData = user to Clock.System.now() },
+                onEditClick = {editingEveningData = true},
                 icon = {
                     Icon(
                         imageVector = Icons.Outlined.Bedtime,
@@ -126,6 +133,7 @@ fun MainScreen(
         ) {
             /** litter box row */
             StatusRow(
+                isEditing = editingPoopScoopData,
                 isComplete = poopScoopDataSnap != null,
                 pendingLabel = "Scoop Poop",
                 completeTitle = "Litter box - Done ✓",
@@ -133,6 +141,7 @@ fun MainScreen(
                 badgeBackground = LitterBadgeBg,
                 badgeForeground = LitterBadgeFg,
                 onClick = { poopScoopData = user to Clock.System.now() },
+                onEditClick = {editingPoopScoopData = true},
                 icon = {
                     Icon(
                         imageVector = Icons.Outlined.DeleteOutline,
@@ -262,17 +271,20 @@ private fun TaskSectionCard(
  * if the even has been completed it shows some text to give information about the completion.
  * otherwise it shows a button to allow the user to complete the task
  *
+ * @property isEditing Whether the client is currently editing
  * @property isComplete Whether any user has completed this task.
  * @property pendingLabel Label for the button when the task has not been completed.
  * @property completeTitle Main text to be displayed when the task is complete.
  * @property completeSubtitle Secondary text displaying information about who completed the task and when.
  * @property badgeBackground color of the circle behind the icon.
  * @property badgeForeground color of the icon.
+ * @property onEditClick called when the edit button is clicked.
  * @property onClick called when the button is clicked.
  * @property icon composable displayed to the left of the button.
  */
 @Composable
 private fun StatusRow(
+    isEditing: Boolean,
     isComplete: Boolean,
     pendingLabel: String,
     completeTitle: String,
@@ -280,6 +292,7 @@ private fun StatusRow(
     badgeBackground: Color,
     badgeForeground: Color,
     onClick: () -> Unit,
+    onEditClick: () -> Unit,
     icon: @Composable () -> Unit
 ) {
     /** align things from left to right */
@@ -337,7 +350,7 @@ private fun StatusRow(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            IconButton(onClick = { }) {
+            IconButton(onClick = onEditClick) {
                 Icon(
                     imageVector = Icons.Outlined.Edit,
                     contentDescription = "Edit"
