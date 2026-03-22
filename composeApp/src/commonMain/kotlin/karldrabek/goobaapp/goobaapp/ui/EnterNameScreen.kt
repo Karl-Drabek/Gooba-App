@@ -43,10 +43,10 @@ fun EnterNameScreen(onSave: (User) -> Unit) {
         Button(
             onClick = {
                 if (registerName(name)) {
-                    onSave(User(name))
+                    onSave(User(name = name))
                 } else {
                     if (existingName) {
-                        onSave(User(name))
+                        onSave(User(name = name))
                     } else {
                         existingName = true
                     }

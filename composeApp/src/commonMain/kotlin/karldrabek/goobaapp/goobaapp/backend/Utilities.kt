@@ -27,7 +27,6 @@ fun scoop(user: User) {
         // Prompt warning
     }
 
-
 }
 
 // Add the name to the DB and return whether it already exists

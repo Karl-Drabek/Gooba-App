@@ -8,4 +8,7 @@ import kotlinx.datetime.DayOfWeek
  * @property scoopDay the DayofWeek which the user is assigned to scoop the poop.
  * @constructor Creates a user with a name who is assigned to no day to scoop poop.
  */
-data class User(var name: String, var scoopDay: DayOfWeek? = null)
+data class User(
+    var name: String,
+    var scoopDay: DayOfWeek? = null,
+)
