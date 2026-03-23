@@ -59,7 +59,7 @@ import karldrabek.goobaapp.goobaapp.ui.theme.PrimaryPurple
 import karldrabek.goobaapp.goobaapp.ui.utils.DropDown
 import karldrabek.goobaapp.goobaapp.ui.utils.NameEntryBox
 import karldrabek.goobaapp.goobaapp.ui.utils.PopUp
-import karldrabek.goobaapp.goobaapp.ui.utils.Task
+import karldrabek.goobaapp.goobaapp.utils.Task
 import karldrabek.goobaapp.goobaapp.ui.utils.TimeDropDown
 import karldrabek.goobaapp.goobaapp.utils.EventCompletedData
 import karldrabek.goobaapp.goobaapp.utils.TimeFormat
