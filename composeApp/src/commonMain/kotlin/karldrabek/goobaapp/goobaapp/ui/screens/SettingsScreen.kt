@@ -48,7 +48,7 @@ fun SettingsScreen(user: User, onExit: () -> Unit, onSaveClicked: (User) -> Unit
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -58,7 +58,7 @@ fun SettingsScreen(user: User, onExit: () -> Unit, onSaveClicked: (User) -> Unit
             fontWeight = FontWeight.Bold,
         )
 
-        // gooba poop day luke gay ---> Kearnan GAYER --> Kearnan GAYEST
+        // gooba poop day luke gay ---> Kearnan GAYER --> Kearnan GAYEST --> doesnt rhyme faggot
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -136,7 +136,7 @@ fun SettingsScreen(user: User, onExit: () -> Unit, onSaveClicked: (User) -> Unit
 
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .padding(24.dp),
                     contentAlignment = Alignment.Center
                 ) {
