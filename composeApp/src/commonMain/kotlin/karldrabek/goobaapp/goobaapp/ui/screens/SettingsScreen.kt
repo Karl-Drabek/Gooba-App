@@ -3,11 +3,14 @@ package karldrabek.goobaapp.goobaapp.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -16,6 +19,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
@@ -51,7 +56,13 @@ fun SettingsScreen(user: User, onExit: () -> Unit, onSaveClicked: (User) -> Unit
             .fillMaxWidth()
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
+    )
+
+    {
+        Row {
+            IconButton(onClick = onExit) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back") }
+            Text("Settings")
+        }
         Text(
             text = "Settings",
             style = MaterialTheme.typography.titleMedium,
