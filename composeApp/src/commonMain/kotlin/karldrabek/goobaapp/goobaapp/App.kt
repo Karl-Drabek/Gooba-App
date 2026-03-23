@@ -13,14 +13,17 @@ import karldrabek.goobaapp.goobaapp.ui.MainScreen
 import karldrabek.goobaapp.goobaapp.ui.SettingsScreen
 import karldrabek.goobaapp.goobaapp.ui.theme.GoobaTheme
 import kotlinx.datetime.DayOfWeek
+import org.koin.core.context.startKoin
 
 /**
  * Entry Point for Gooba App
- *
  */
 @Composable
 @Preview
 fun App() {
+    /** Module Setup */
+    initKoin()
+
     /** Stores state */
     var state by remember { mutableStateOf(AppState.NAME_ENTRY) }
     var user by remember { mutableStateOf<User?>(null) }
@@ -55,5 +58,11 @@ fun App() {
                 }
             }
         }
+    }
+}
+
+fun initKoin() {
+    startKoin {
+        modules(networkModule)
     }
 }

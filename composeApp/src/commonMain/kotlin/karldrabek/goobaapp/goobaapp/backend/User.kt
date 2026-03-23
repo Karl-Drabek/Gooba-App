@@ -1,6 +1,7 @@
 package karldrabek.goobaapp.goobaapp.backend
 
-import kotlinx.datetime.DayOfWeek
+import kotlinx.serialization.Serializable
+
 /**
  * User stores all data for the user that is stored in the DB.
  *
@@ -8,7 +9,8 @@ import kotlinx.datetime.DayOfWeek
  * @property scoopDay the DayofWeek which the user is assigned to scoop the poop.
  * @constructor Creates a user with a name who is assigned to no day to scoop poop.
  */
-data class User(var name: String, var scoopDay: String = ""){
+@Serializable
+data class User(var name: String, var scoopDay: String = "", var id:Int=0){
     override fun toString(): String {
         return name
     }

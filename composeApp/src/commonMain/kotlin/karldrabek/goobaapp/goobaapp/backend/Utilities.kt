@@ -1,14 +1,18 @@
 package karldrabek.goobaapp.goobaapp.backend
 
+import io.ktor.client.HttpClient
 import kotlinx.datetime.*
 import kotlin.time.Instant
 import kotlin.time.Clock
-
-data class serverMessage(
-    val user: User,
-    val time: Instant = Clock.System.now(),
-    val message: String = ""
-)
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import io.ktor.client.*
+import io.ktor.client.call.body
+import io.ktor.client.engine.cio.*
+import io.ktor.client.request.*
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import karldrabek.goobaapp.goobaapp.*
 
 enum class Mealtime {
     EVENING,
@@ -24,14 +28,31 @@ fun scoop(user: User) {
     // Check the day
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
     if (user.scoopDay.uppercase() != today.dayOfWeek.toString().uppercase()) {
-        // Prompt warning
+        // Prompt warning, return early if no
     }
+
 
 }
 
-// Add the name to the DB and return whether it already exists
-fun registerName(name: String) : Boolean {
-    return false //TODO: Implement
+/** Adds a User to the database if it does not exist, always returns the clients user
+ * @param name username
+ * @return App user
+ */
+suspend fun KoinComponent.registerUser (name: String, scoopDay : String = "") : User? {
+    val client : HttpClient by inject()
+
+    // Get the list of users with matching name from db
+    val users: List<User>? = client.get(searchUserUrl(name)).body()
+    if (!users.isNullOrEmpty() && users.size == 1) {
+        // Return the user
+        return users[0]
+    } else { // User not found in the list
+        // Return the added user
+        return client.post(postUsersUrl) {
+            contentType(ContentType.Application.Json)
+            setBody(User(name=name, scoopDay=scoopDay))
+        }.body()
+    }
 }
 
 /**

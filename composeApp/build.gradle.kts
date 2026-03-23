@@ -1,4 +1,8 @@
+import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+val koinVersion: String by project
+val ktorVersion: String by project
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -44,8 +48,12 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1-0.6.x-compat")
             implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
-            implementation("io.ktor:ktor-client-core:3.4.1")
-            implementation("io.ktor:ktor-client-cio:3.4.1")
+            implementation("io.ktor:ktor-client-core:${ktorVersion}")
+            implementation("io.ktor:ktor-client-cio:${ktorVersion}")
+            implementation("io.ktor:ktor-client-logging:${ktorVersion}")
+            implementation("io.ktor:ktor-client-content-negotiation:${ktorVersion}")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:${ktorVersion}")
+            implementation("io.insert-koin:koin-core:${koinVersion}")
         }
 
         commonTest.dependencies {
