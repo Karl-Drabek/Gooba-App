@@ -3,24 +3,25 @@ package karldrabek.goobaapp.goobaapp
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import karldrabek.goobaapp.goobaapp.ui.EnterNameScreen
+import karldrabek.goobaapp.goobaapp.ui.screens.EnterNameScreen
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import karldrabek.goobaapp.goobaapp.backend.User
-import karldrabek.goobaapp.goobaapp.ui.HistoryScreen
-import karldrabek.goobaapp.goobaapp.ui.MainScreen
-import karldrabek.goobaapp.goobaapp.ui.SettingsScreen
+import karldrabek.goobaapp.goobaapp.ui.screens.HistoryScreen
+import karldrabek.goobaapp.goobaapp.ui.screens.MainScreen
+import karldrabek.goobaapp.goobaapp.ui.screens.SettingsScreen
 import karldrabek.goobaapp.goobaapp.ui.theme.GoobaTheme
 import kotlinx.datetime.DayOfWeek
 
 /**
  * Entry Point for Gooba App
  *
+ * @param context this is the context used for android apps, specifically pickTime. pass null if on IOS
+ *
  */
 @Composable
-@Preview
-fun App() {
+fun App(context: Any?) {
     /** Stores state */
     var state by remember { mutableStateOf(AppState.NAME_ENTRY) }
     var user by remember { mutableStateOf<User?>(null) }

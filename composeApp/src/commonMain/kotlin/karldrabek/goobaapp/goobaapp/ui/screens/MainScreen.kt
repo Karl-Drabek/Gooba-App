@@ -1,4 +1,4 @@
-package karldrabek.goobaapp.goobaapp.ui
+package karldrabek.goobaapp.goobaapp.ui.screens
 
 
 import androidx.compose.foundation.BorderStroke
@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bedtime
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Pets
 import androidx.compose.material.icons.outlined.Settings
@@ -36,12 +38,22 @@ import karldrabek.goobaapp.goobaapp.backend.User
 import karldrabek.goobaapp.goobaapp.ui.theme.MorningBadgeBg
 import karldrabek.goobaapp.goobaapp.ui.theme.MorningBadgeFg
 import kotlinx.datetime.TimeZone
-import karldrabek.goobaapp.goobaapp.backend.formatTime
+import karldrabek.goobaapp.goobaapp.utils.timeToText
 import karldrabek.goobaapp.goobaapp.ui.theme.EveningBadgeBg
 import karldrabek.goobaapp.goobaapp.ui.theme.EveningBadgeFg
 import karldrabek.goobaapp.goobaapp.ui.theme.LitterBadgeBg
 import karldrabek.goobaapp.goobaapp.ui.theme.LitterBadgeFg
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import karldrabek.goobaapp.goobaapp.ui.theme.InputBackground
+import karldrabek.goobaapp.goobaapp.ui.theme.MutedText
+import karldrabek.goobaapp.goobaapp.ui.theme.PrimaryPurple
+import karldrabek.goobaapp.goobaapp.ui.utils.DropDown
+import karldrabek.goobaapp.goobaapp.utils.timeToValues
+import karldrabek.goobaapp.goobaapp.utils.valuesToTime
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -62,17 +74,12 @@ fun MainScreen(
     onOpenHistory: () -> Unit,
 ) {
     /** State */
-    var morningFoodData: Pair<User, Instant>? by remember { mutableStateOf(null) }
-    var eveningFoodData: Pair<User, Instant>? by remember { mutableStateOf(null) }
-    var poopScoopData: Pair<User, Instant>? by remember { mutableStateOf(null) }
+    var morningFoodData: Pair<String, Instant>? by remember { mutableStateOf(null) }
+    var eveningFoodData: Pair<String, Instant>? by remember { mutableStateOf(null) }
+    var poopScoopData: Pair<String, Instant>? by remember { mutableStateOf(null) }
     var editingMorningData: Boolean by remember { mutableStateOf(false) }
     var editingEveningData: Boolean by remember { mutableStateOf(false) }
     var editingPoopScoopData: Boolean by remember { mutableStateOf(false) }
-
-    /** Make read only so we can verify they are non-null*/
-    val morningFoodDataSnap = morningFoodData
-    val eveningFoodDataSnap = eveningFoodData
-    val poopScoopDataSnap = poopScoopData
 
     /** layout elements on top of each other */
     Column(
@@ -90,15 +97,19 @@ fun MainScreen(
         ) {
             /** morning feeding row */
             StatusRow(
+                data = morningFoodData,
                 isEditing = editingMorningData,
-                isComplete = morningFoodDataSnap != null,
                 pendingLabel = "Feed Breakfast",
                 completeTitle = "Morning - Fed ✓",
-                completeSubtitle = morningFoodDataSnap?.let { "By ${it.first} at ${formatTime(it.second)}" } ?: "",
                 badgeBackground = MorningBadgeBg,
                 badgeForeground = MorningBadgeFg,
                 onEditClick = {editingMorningData = true},
-                onClick = { morningFoodData = user to Clock.System.now() },
+                onClick = { morningFoodData = user.name to Clock.System.now() },
+                onUpdateData = {
+                    morningFoodData = it
+                    editingMorningData = false
+                               },
+                onDeleteEntry = { morningFoodData = null },
                 icon = {
                     Icon(
                         imageVector = Icons.Outlined.WbSunny,
@@ -109,15 +120,19 @@ fun MainScreen(
 
             /** evening feeding row */
             StatusRow(
+                data = eveningFoodData,
                 isEditing = editingEveningData,
-                isComplete = eveningFoodDataSnap != null,
                 pendingLabel = "Feed Dinner",
                 completeTitle = "Evening - Fed ✓",
-                completeSubtitle = eveningFoodDataSnap?.let { "By ${it.first} at ${formatTime(it.second)}" } ?: "",
                 badgeBackground = EveningBadgeBg,
                 badgeForeground = EveningBadgeFg,
-                onClick = { eveningFoodData = user to Clock.System.now() },
+                onClick = { eveningFoodData = user.name to Clock.System.now() },
                 onEditClick = {editingEveningData = true},
+                onUpdateData = {
+                    eveningFoodData = it
+                    editingEveningData = false
+                               },
+                onDeleteEntry = { eveningFoodData = null },
                 icon = {
                     Icon(
                         imageVector = Icons.Outlined.Bedtime,
@@ -133,15 +148,19 @@ fun MainScreen(
         ) {
             /** litter box row */
             StatusRow(
+                data = poopScoopData,
                 isEditing = editingPoopScoopData,
-                isComplete = poopScoopDataSnap != null,
                 pendingLabel = "Scoop Poop",
                 completeTitle = "Litter box - Done ✓",
-                completeSubtitle = poopScoopDataSnap?.let { "By ${it.first} at ${formatTime(it.second)}" } ?: "",
                 badgeBackground = LitterBadgeBg,
                 badgeForeground = LitterBadgeFg,
-                onClick = { poopScoopData = user to Clock.System.now() },
+                onClick = { poopScoopData = user.name to Clock.System.now() },
                 onEditClick = {editingPoopScoopData = true},
+                onUpdateData = {
+                    poopScoopData = it
+                    editingPoopScoopData = false
+                               },
+                onDeleteEntry = { poopScoopData = null },
                 icon = {
                     Icon(
                         imageVector = Icons.Outlined.DeleteOutline,
@@ -271,28 +290,30 @@ private fun TaskSectionCard(
  * if the even has been completed it shows some text to give information about the completion.
  * otherwise it shows a button to allow the user to complete the task
  *
+ * @property data Whether the client is currently editing
  * @property isEditing Whether the client is currently editing
- * @property isComplete Whether any user has completed this task.
  * @property pendingLabel Label for the button when the task has not been completed.
  * @property completeTitle Main text to be displayed when the task is complete.
- * @property completeSubtitle Secondary text displaying information about who completed the task and when.
  * @property badgeBackground color of the circle behind the icon.
  * @property badgeForeground color of the icon.
  * @property onEditClick called when the edit button is clicked.
- * @property onClick called when the button is clicked.
+ * @property onClick called when the complete button is clicked.
+ * @property onUpdateData called when the save button is clicked.
+ * @property onDeleteEntry called when the delete button is clicked.
  * @property icon composable displayed to the left of the button.
  */
 @Composable
 private fun StatusRow(
+    data: Pair<String, Instant>?,
     isEditing: Boolean,
-    isComplete: Boolean,
     pendingLabel: String,
     completeTitle: String,
-    completeSubtitle: String,
     badgeBackground: Color,
     badgeForeground: Color,
     onClick: () -> Unit,
     onEditClick: () -> Unit,
+    onUpdateData: (Pair<String, Instant>) -> Unit,
+    onDeleteEntry: () -> Unit,
     icon: @Composable () -> Unit
 ) {
     /** align things from left to right */
@@ -312,7 +333,7 @@ private fun StatusRow(
         }
 
         /** no one has completed the task so allow user to complete with a button */
-        if (!isComplete) {
+        if (data == null) {
             OutlinedButton(
                 onClick = onClick,
                 modifier = Modifier.weight(1f),
@@ -333,28 +354,131 @@ private fun StatusRow(
                 )
             }
         } else { /** task has been completed by someone */
-            /** display two pieces of text one on top of the other */
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                /** main text for the task being done */
-                Text(
-                    text = completeTitle,
-                    style = MaterialTheme.typography.titleLarge
-                )
-                 /** subtext for when the user did the task */
-                Text(
-                    text = completeSubtitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            IconButton(onClick = onEditClick) {
-                Icon(
-                    imageVector = Icons.Outlined.Edit,
-                    contentDescription = "Edit"
-                )
+            if(isEditing) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(22.dp)
+                ){
+                    val triple = timeToValues(data.second)
+                    /** first->Hour, second->Minute, third->am/pm*/
+
+                    /** State */
+                    var name by remember { mutableStateOf(data.first) }
+                    var hour by remember { mutableStateOf(triple.first) }
+                    var minute by remember { mutableStateOf(triple.second) }
+                    var amPm by remember { mutableStateOf(triple.third) }
+
+                    /** Text entry for the username */
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = {
+                            name = it
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        /** force one line even on enter */
+                        placeholder = {
+                            Text("Enter name")
+                        },
+                        /** By default, capitalize the first letter of each word */
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Words
+                        ),
+                        shape = MaterialTheme.shapes.medium,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = InputBackground,
+                            unfocusedBorderColor = InputBackground,
+                            focusedContainerColor = InputBackground,
+                            unfocusedContainerColor = InputBackground,
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            focusedPlaceholderColor = MutedText,
+                            unfocusedPlaceholderColor = MutedText,
+                            cursorColor = PrimaryPurple
+                        )
+                    )
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        /** Hour dropdown */
+                        DropDown(
+                            label = "Hour",
+                            options = (1..12).toList(),
+                            selected = hour,
+                            onSelected = { hour = it },
+                            modifier = Modifier.weight(1f),
+                        )
+
+                        /** Minute dropdown*/
+                        DropDown(
+                            label = "Min",
+                            options = (0..59).toList(),
+                            selected = minute,
+                            onSelected = { minute = it },
+                            modifier = Modifier.weight(1f),
+                            formatter = { minute -> minute.toString().padStart(2, '0') }
+                        )
+
+                        /** AM/PM dropdown */
+                        DropDown(
+                            label = "AM/PM",
+                            options = listOf("AM", "PM"),
+                            selected = amPm,
+                            onSelected = { amPm = it },
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        /** Save button */
+                        IconButton(
+                            onClick = { onUpdateData(name to valuesToTime(hour, minute, amPm)) },
+                            modifier = Modifier.weight(1f)){
+                            Icon(
+                                imageVector = Icons.Outlined.Save,
+                                contentDescription = "Save"
+                            )
+
+                        }
+
+                        /** Delete button */
+                        IconButton(
+                            onClick = onDeleteEntry,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Delete,
+                                contentDescription = "Delete"
+                            )
+                        }
+                    }
+                }
+
+            }else{
+                /** display two pieces of text one on top of the other */
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    /** main text for the task being done */
+                    Text(
+                        text = completeTitle,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    /** subtext for when the user did the task */
+                    Text(
+                        text = "By ${data.first} at ${timeToText(data.second)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                /** Edit data button */
+                IconButton(onClick = onEditClick) {
+                    Icon(
+                        imageVector = Icons.Outlined.Edit,
+                        contentDescription = "Edit"
+                    )
+                }
             }
         }
     }

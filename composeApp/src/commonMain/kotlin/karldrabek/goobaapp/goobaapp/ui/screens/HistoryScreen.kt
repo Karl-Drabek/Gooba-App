@@ -1,4 +1,4 @@
-package karldrabek.goobaapp.goobaapp.ui
+package karldrabek.goobaapp.goobaapp.ui.screens
 
 import androidx.compose.runtime.Composable
 import karldrabek.goobaapp.goobaapp.backend.User
