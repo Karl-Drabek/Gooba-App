@@ -39,7 +39,7 @@ import karldrabek.goobaapp.goobaapp.ui.theme.PrimaryPurple
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(user: User, onSaveClicked: () -> Unit) {
+fun SettingsScreen(user: User, onExit: () -> Unit, onSaveClicked: (User) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     var newUser by remember { mutableStateOf(user) }
     var existingName by remember { mutableStateOf(false) }
@@ -54,15 +54,14 @@ fun SettingsScreen(user: User, onSaveClicked: () -> Unit) {
     ) {
         Text(
             text = "Settings",
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            color = Color.Gray
         )
 
-        // gooba poop day luke gay ---> Kearnan GAYER
+        // gooba poop day luke gay ---> Kearnan GAYER --> Kearnan GAYEST
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(24.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -196,7 +195,7 @@ fun SettingsScreen(user: User, onSaveClicked: () -> Unit) {
                                 )
                             )
                             Button(
-                                onClick = onSaveClicked,
+                                onClick = { onSaveClicked(newUser) },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = ButtonDefaults.buttonColors(containerColor = PrimaryPurple)
                             ) {

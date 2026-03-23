@@ -33,6 +33,8 @@ import karldrabek.goobaapp.goobaapp.ui.theme.ButtonDisabled
 import karldrabek.goobaapp.goobaapp.ui.theme.InputBackground
 import karldrabek.goobaapp.goobaapp.ui.theme.MutedText
 import karldrabek.goobaapp.goobaapp.ui.theme.PrimaryPurple
+import karldrabek.goobaapp.goobaapp.ui.utils.NameEntryBox
+
 /**
  * EnterNameScreen handles the name entry for the first time that
  * the user enters the application
@@ -101,34 +103,10 @@ fun EnterNameScreen(onSave: (User) -> Unit) {
                     color = MutedText
                 )
 
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = {
-                        name = it
-                        existingName = false
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true, /** force one line even on enter */
-                    placeholder = {
-                        Text("Your name")
-                    },
-                    /** By default, capitalize the first letter of each word */
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Words
-                    ),
-                    shape = MaterialTheme.shapes.medium,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = InputBackground,
-                        unfocusedBorderColor = InputBackground,
-                        focusedContainerColor = InputBackground,
-                        unfocusedContainerColor = InputBackground,
-                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                        focusedPlaceholderColor = MutedText,
-                        unfocusedPlaceholderColor = MutedText,
-                        cursorColor = PrimaryPurple
-                    )
-                )
+                NameEntryBox(name){
+                    name = it
+                    existingName = false
+                }
 
                 Button(
                     onClick = {

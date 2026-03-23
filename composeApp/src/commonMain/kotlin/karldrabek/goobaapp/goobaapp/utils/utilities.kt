@@ -17,11 +17,11 @@ import kotlin.time.Instant
  * @property Instant the time to be converted
  */
 fun timeToText(instant: Instant): String {
-    val triple = timeToValues(instant)
+    val time = timeToValues(instant)
 
-    val minutePadded = triple.second.toString().padStart(2, '0')
+    val minutePadded = time.minute.toString().padStart(2, '0')
 
-    return "${triple.first}:${minutePadded} ${triple.third}"
+    return "${time.hour}:${minutePadded} ${time.amPm}"
 }
 
 /**
@@ -30,7 +30,7 @@ fun timeToText(instant: Instant): String {
  *
  * @property Instant the time to be converted
  */
-fun timeToValues(instant: Instant): Triple<Int, Int, String> {
+fun timeToValues(instant: Instant): TimeFormat {
     val local = instant.toLocalDateTime(TimeZone.currentSystemDefault())
 
     val hour24 = local.hour
@@ -42,27 +42,23 @@ fun timeToValues(instant: Instant): Triple<Int, Int, String> {
         hour24 > 12 -> hour24 - 12
         else -> hour24
     }
-    return Triple(hour12, minute, amPm)
+    return TimeFormat(hour12, minute, amPm)
 }
 
+
+// TODO make it so that the time is for the correct day
 /**
  * Takes the time format and recreates the instant:
  *
- * @property hour12 hour from 1-12
- * @property minute minute from 0-59
- * @property amPm AM for morning, PM for evening
+ * @property time the TimeFormat representing the time
  */
-fun valuesToTime(
-    hour12: Int,
-    minute: Int,
-    amPm: String
-): Instant {
+fun valuesToTime(time: TimeFormat): Instant {
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
-    val hour24 = when (amPm) {
-        "AM" if hour12 == 12 -> 0
-        "PM" if hour12 != 12 -> hour12 + 12
-        else -> hour12
+    val hour24 = when (time.amPm) {
+        "AM" if time.hour == 12 -> 0
+        "PM" if time.hour != 12 -> time.hour + 12
+        else -> time.hour
     }
 
     return LocalDateTime(
@@ -70,7 +66,7 @@ fun valuesToTime(
         month = today.month.number,
         day = today.day,
         hour = hour24,
-        minute = minute,
+        minute = time.minute,
         second = 0,
         nanosecond = 0
     ).toInstant(TimeZone.currentSystemDefault())

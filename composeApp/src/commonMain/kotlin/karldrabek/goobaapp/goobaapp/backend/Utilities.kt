@@ -13,15 +13,6 @@ data class serverMessage(
     val message: String = ""
 )
 
-enum class Mealtime {
-    EVENING,
-    MORNING
-}
-
-fun feed(user : User, mealtime: Mealtime, time: Instant = Clock.System.now()) {
-    // TODO: add entry to the DB
-}
-
 //
 fun scoop(user: User) {
     // Check the day
