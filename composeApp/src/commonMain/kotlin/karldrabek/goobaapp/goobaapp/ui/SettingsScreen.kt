@@ -59,7 +59,7 @@ fun SettingsScreen(user: User, onSaveClicked: () -> Unit) {
             color = Color.Gray
         )
 
-        // gooba poop day luke gay
+        // gooba poop day luke gay ---> Kearnan GAYER
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -125,15 +125,15 @@ fun SettingsScreen(user: User, onSaveClicked: () -> Unit) {
                                     }
                                 )
 
+                            }
+
+                        }
+
+
                     }
 
+
                 }
-
-
-            }
-
-
-        }
 
                 Box(
                     modifier = Modifier
@@ -205,10 +205,8 @@ fun SettingsScreen(user: User, onSaveClicked: () -> Unit) {
 
                         }
                     }
-
                 }
-
-
             }
-
         }
+    }
+}
