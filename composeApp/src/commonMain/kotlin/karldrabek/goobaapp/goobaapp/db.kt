@@ -12,14 +12,22 @@ import org.koin.dsl.module
 import kotlinx.serialization.json.Json
 
 /** search URLS for database calls */
-
-val getUsersUrl = "http://127.0.0.1:1738/users"
+val serverUrl = "http://127.0.0.1:1738"
+val getUsersUrl = "$serverUrl/users"
 val deleteUsersUrl = "$getUsersUrl"
 val postUsersUrl = "$getUsersUrl"
 
 val putUsersUrl = "$getUsersUrl"
 val clearUsersUrl = "$getUsersUrl/admin/clear"
-suspend fun searchUserUrl(name : String) : String = "$getUsersUrl/search/$name"
+fun searchUserUrl(name : String) : String = "$getUsersUrl/search/$name"
+
+val getTasksUrl = "$serverUrl/tasks"
+val deleteTasksUrl = "$getTasksUrl"
+val postTasksUrl = "$getTasksUrl"
+val putTasksUrl = "$getTasksUrl"
+val clearTasksUrl = "$deleteTasksUrl/clear"
+fun searchTaskUrl(type: String) : String = "$getTasksUrl/search/$type"
+
 
 val networkModule = module {
     single {
@@ -33,7 +41,7 @@ val networkModule = module {
 
             install(Logging) {
                 logger = Logger.DEFAULT
-                level = LogLevel.ALL // 🔥 increase visibility
+                level = LogLevel.ALL
             }
         }
     }

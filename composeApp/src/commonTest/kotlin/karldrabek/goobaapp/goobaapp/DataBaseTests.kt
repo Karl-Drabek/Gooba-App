@@ -17,7 +17,8 @@ import kotlin.test.assertTrue
 
 class DataBaseTests : KoinTest {
 
-    private val remoteManager = UserRemoteManager
+    private val userRemoteManager = UserRemoteManager
+    private val taskRemoteManager = TaskRemoteManager
     // Warning!! CURRENT IMPLEMENTATION CLEARS ALL USERS BEFORE TESTING FOR DEBUGGING
     @BeforeTest
     fun setup() {
@@ -26,8 +27,10 @@ class DataBaseTests : KoinTest {
             modules(networkModule)
         }
 
+
         runTest {
-            remoteManager.clearAllUsers()
+            taskRemoteManager.clearAllTasks()
+            userRemoteManager.clearAllUsers()
         }
     }
 
@@ -35,7 +38,8 @@ class DataBaseTests : KoinTest {
     fun tearDown() {
 
         runTest {
-            remoteManager.clearAllUsers()
+            taskRemoteManager.clearAllTasks()
+            userRemoteManager.clearAllUsers()
         }
 
         stopKoin()
@@ -47,44 +51,44 @@ class DataBaseTests : KoinTest {
 
         // Create a random user
         // Add them to the db
-        var ashUser = remoteManager.registerUser(User(name = "Ashton"))
+        var ashUser = userRemoteManager.registerUser(User(name = "Ashton"))
         assertEquals("Ashton", ashUser?.name, message = "Register User Test 2 ")
 
         // Verify users were added
-        var users: List<User>? = remoteManager.getAllUsers()
+        var users: List<User>? = userRemoteManager.getAllUsers()
         assertTrue(!users.isNullOrEmpty() && users.size == 1, message = "Get Users Test 1")
 
         // Add another user
-        val lukeUser = remoteManager.registerUser(User(name="Luke"))
+        val lukeUser = userRemoteManager.registerUser(User(name="Luke"))
         assertEquals("Luke", lukeUser?.name, message = "Register User Test 2 ")
 
         // Verify users were added
-        users = remoteManager.getAllUsers()
+        users = userRemoteManager.getAllUsers()
         assertTrue(!users.isNullOrEmpty() && users.size == 2, message = "Get Users Test 2 ")
 
         if(lukeUser != null) {
             // Try to add the same user twice
-            remoteManager.registerUser(lukeUser)
+            userRemoteManager.registerUser(lukeUser)
         }
 
-        users = remoteManager.getAllUsers()
+        users = userRemoteManager.getAllUsers()
         assertTrue(!users.isNullOrEmpty() && users.size == 2, message = "Repeat user test")
 
         // Delete a user
-        val success: Boolean = remoteManager.deleteUser(lukeUser)
+        val success: Boolean = userRemoteManager.deleteUser(lukeUser)
         assertTrue(success, message = "Delete User Test")
 
         // Verify user is not there
         if(lukeUser != null) {
             // Try to add the same user twice
-            users = remoteManager.searchUser(lukeUser)
+            users = userRemoteManager.searchUser(lukeUser)
             assertTrue(users.isNullOrEmpty(), message = "Search for deleted user")
         }
 
         // Verify Ashton is there
         if(ashUser != null) {
 
-            users = remoteManager.searchUser(ashUser)
+            users = userRemoteManager.searchUser(ashUser)
             assertTrue(!users.isNullOrEmpty(), message = "Search for existing user")
         }
 
@@ -93,7 +97,7 @@ class DataBaseTests : KoinTest {
         ashUser?.name = "Karl"
 
         if(ashUser != null) {
-            ashUser = remoteManager.updateUser(ashUser)
+            ashUser = userRemoteManager.updateUser(ashUser)
         }
 
         assertEquals(ashUser?.name, "Karl", message = "Put Test 1")
