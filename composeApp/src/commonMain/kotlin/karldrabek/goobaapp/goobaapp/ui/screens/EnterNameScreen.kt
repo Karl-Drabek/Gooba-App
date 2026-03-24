@@ -118,7 +118,7 @@ fun EnterNameScreen(onSave: (User) -> Unit) {
 
                         // TODO -> LUKE FUCKED THIS UP FR !!
 
-//                        if (registerName(trimmed)) {
+//                        if (false) {
 //                            onSave(User(trimmed))
 //                        } else if (existingName) {
 //                            onSave(User(trimmed))
