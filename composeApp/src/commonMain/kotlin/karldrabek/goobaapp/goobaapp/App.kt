@@ -21,8 +21,7 @@ import org.koin.core.context.startKoin
  * @param context this is the context used for android apps, specifically pickTime. pass null if on IOS
  */
 @Composable
-@Preview
-fun App() {
+fun App(context: Any?) {
     /** Module Setup */
     initKoin()
 

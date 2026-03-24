@@ -49,6 +49,7 @@ fun EnterNameScreen(onSave: (User) -> Unit) {
       * the current name in the input box */
     var name by remember { mutableStateOf("") }
     var existingName by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     /** background */
     Box(
@@ -115,6 +116,8 @@ fun EnterNameScreen(onSave: (User) -> Unit) {
                         val trimmed = name.trim()
                         if (trimmed.isEmpty()) return@Button /** labeled return exits  button lambda */
 
+                        // TODO -> LUKE FUCKED THIS UP FR !!
+
 //                        if (registerName(trimmed)) {
 //                            onSave(User(trimmed))
 //                        } else if (existingName) {
@@ -123,6 +126,7 @@ fun EnterNameScreen(onSave: (User) -> Unit) {
 //                            existingName = true
 //                        }
 
+                        // The scope is a mutex, db requires Coroutines which are threads
                         scope.launch {
                             // Adds a new user, returns the existing user if it exists
                             val registeredUser = registerUser(User(name = trimmed))
@@ -131,8 +135,8 @@ fun EnterNameScreen(onSave: (User) -> Unit) {
                             } else {
                                 existingName = true
                             }
-
                         }
+
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
