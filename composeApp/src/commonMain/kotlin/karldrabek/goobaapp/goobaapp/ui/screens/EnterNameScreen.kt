@@ -25,11 +25,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import karldrabek.goobaapp.goobaapp.backend.User
+import karldrabek.goobaapp.goobaapp.backend.UserRemoteManager.registerUser
 import karldrabek.goobaapp.goobaapp.ui.theme.ButtonDisabled
+import karldrabek.goobaapp.goobaapp.ui.theme.InputBackground
 import karldrabek.goobaapp.goobaapp.ui.theme.MutedText
 import karldrabek.goobaapp.goobaapp.ui.theme.PrimaryPurple
+import kotlinx.coroutines.launch
+
 import karldrabek.goobaapp.goobaapp.ui.utils.NameEntryBox
 
 /**
@@ -110,17 +115,24 @@ fun EnterNameScreen(onSave: (User) -> Unit) {
                         val trimmed = name.trim()
                         if (trimmed.isEmpty()) return@Button /** labeled return exits  button lambda */
 
+//                        if (registerName(trimmed)) {
+//                            onSave(User(trimmed))
+//                        } else if (existingName) {
+//                            onSave(User(trimmed))
+//                        } else {
+//                            existingName = true
+//                        }
 
-                        onSave(User(name = trimmed))
-                        //TODO add functions from backend
-                        /*
-                        if (registerName(trimmed)) {
-                            onSave(User(trimmed))
-                        } else if (existingName) {
-                            onSave(User(trimmed))
-                        } else {
-                            existingName = true
-                        }*/
+                        scope.launch {
+                            // Adds a new user, returns the existing user if it exists
+                            val registeredUser = registerUser(User(name = trimmed))
+                            if(registeredUser != null) {
+                                onSave(registeredUser)
+                            } else {
+                                existingName = true
+                            }
+
+                        }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,

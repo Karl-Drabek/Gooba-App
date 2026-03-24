@@ -2,63 +2,128 @@ package karldrabek.goobaapp.goobaapp.backend
 
 import karldrabek.goobaapp.goobaapp.utils.Task
 import karldrabek.goobaapp.goobaapp.utils.TaskCompletionDay
+import io.ktor.client.HttpClient
+import kotlinx.datetime.*
 import kotlin.time.Instant
+import kotlin.time.Clock
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import io.ktor.client.*
+import io.ktor.client.call.body
+import io.ktor.client.engine.cio.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import karldrabek.goobaapp.goobaapp.*
+import kotlinx.serialization.json.JsonElement
 
-/**
- * registers the name under a new user ID in the server or returns
- * the existing user ID if it exists.
- *
- * @param name the name to register or fetch
- * @return the user ID for the name
- */
-fun registerUserID(name: String): Int {
-    //TODO
-    return -1
+enum class Mealtime {
+    EVENING,
+    MORNING
 }
 
-/**
- * Edits the user to have a new name or gooba schedule.
- *
- * @param userID the userID which will be edited
- * @param user the new name and gooba schedule for the user
- */
-fun editUser(userID: Int, user: User){
-    // TODO
+fun feed(user : User, mealtime: Mealtime, time: Instant = Clock.System.now()) {
+    // TODO: add entry to the DB
 }
 
-/**
- * Makes the user as deleted in the database. This means they will not be
- * displayed as assigned for their gooba day, and cannot be selected in a
- * user dropdown menu, but their previous tasks will still be associated
- * with their name, and they will still exist in the database.
- *
- * @param userID the userID which will be deleted
- */
-fun deleteUser(userID: Int){
-    // TODO
+//
+fun scoop(user: User) {
+    // Check the day
+    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+    if (user.scoopDay.uppercase() != today.dayOfWeek.toString().uppercase()) {
+        // Prompt warning, return early if no
+    }
+
+
 }
 
-/**
- * Gets a list of all the non deleted users in the database
- *
- * @return a list containing all the users in the database
- */
-fun getUsers():List<User>{
-    //TODO
-    return listOf()
-}
+object UserRemoteManager: KoinComponent {
 
-/**
- * completes a task under the current userID at a particular time.
- *
- * @param userID the userID associated with the user completing the task
- * @param task the type of task which was completed
- * @param time the time that the task was completed
- * @return the unique task ID for the new completed task.
- */
-fun completeTask(userID: Int, task: Task, time: Instant): Int{
-    // TODO
-    return -1
+    /** Adds a User to the database if it does not exist, always returns the clients user
+     * @param user user
+     * @return App user
+     */
+    suspend fun registerUser (user: User) : User? {
+        val client : HttpClient by inject()
+
+        // Get the list of users with matching name from db
+        val users: List<User>? = searchUser(user)
+        if (!users.isNullOrEmpty()) return users[0]
+
+        // Return the added user
+        val user: User? = client.post(postUsersUrl) {
+            contentType(ContentType.Application.Json)
+            setBody(user)
+        }.body()
+
+        return user
+    }
+
+    /** Updates a given user on the server
+     * @param user new user credentials, id must remain the same
+     * @return new user information
+     */
+    suspend fun updateUser (user: User) : User? {
+        val client : HttpClient by inject()
+
+        val response: HttpResponse =  client.put(putUsersUrl) {
+            contentType(ContentType.Application.Json)
+            setBody(user)
+        }
+
+        if (response.status == HttpStatusCode.OK) {
+            val users = searchUser(user)
+            if (!users.isNullOrEmpty()) return users[0]
+        }
+        return null
+    }
+
+    /** Searches for a user on the DB */
+    suspend fun searchUser(user: User): List<User>?  {
+        val client : HttpClient by inject()
+        val response = client.get(searchUserUrl(user.name))
+
+        return if (response.status == HttpStatusCode.OK) {
+            // Only try to parse JSON if the server said "OK"
+            response.body<List<User>?>()
+        } else if (response.status == HttpStatusCode.NotFound) {
+            // If 404, just return an empty list instead of crashing
+            emptyList()
+        } else {
+            println("Server Error: ${response.status}")
+            emptyList()
+        }
+    }
+
+    /** =======================================
+     *                  WARNING
+     *  =======================================
+     *     CLEARS ALL USERS IN THE DATABASE
+     */
+    suspend fun clearAllUsers() {
+        val client : HttpClient by inject()
+        client.get(clearUsersUrl)
+    }
+
+    /** Returns all users that exist on the database */
+    suspend fun getAllUsers() : List<User>? {
+        val client : HttpClient by inject()
+        return client.get(getUsersUrl).body()
+    }
+
+    /** Returns true if user is successfully deleted */
+    suspend fun deleteUser(user : User?) : Boolean {
+        val client : HttpClient by inject()
+        val response: HttpResponse = client.delete(deleteUsersUrl) {
+            contentType(ContentType.Application.Json)
+            setBody(user)
+        }
+
+        return response.status == HttpStatusCode.OK
+    }
+
 }
 
 /**

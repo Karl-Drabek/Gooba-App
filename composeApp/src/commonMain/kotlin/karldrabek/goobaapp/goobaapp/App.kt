@@ -13,15 +13,19 @@ import karldrabek.goobaapp.goobaapp.ui.screens.MainScreen
 import karldrabek.goobaapp.goobaapp.ui.screens.SettingsScreen
 import karldrabek.goobaapp.goobaapp.ui.theme.GoobaTheme
 import kotlinx.datetime.DayOfWeek
+import org.koin.core.context.startKoin
 
 /**
  * Entry Point for Gooba App
  *
  * @param context this is the context used for android apps, specifically pickTime. pass null if on IOS
- *
  */
 @Composable
-fun App(context: Any?) {
+@Preview
+fun App() {
+    /** Module Setup */
+    initKoin()
+
     /** Stores state */
     var state by remember { mutableStateOf(AppState.NAME_ENTRY) }
     var user by remember { mutableStateOf<User?>(null) }
@@ -62,5 +66,11 @@ fun App(context: Any?) {
                 }
             }
         }
+    }
+}
+
+fun initKoin() {
+    startKoin {
+        modules(networkModule)
     }
 }
