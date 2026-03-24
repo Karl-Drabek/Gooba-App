@@ -2,17 +2,14 @@ package karldrabek.goobaapp.goobaapp
 
 import karldrabek.goobaapp.goobaapp.backend.*
 import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.*
 import kotlinx.datetime.*
-import org.koin.core.component.KoinComponent
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import kotlin.test.AfterTest
 import org.koin.test.KoinTest
 import kotlin.test.BeforeTest
-import kotlin.test.assertTrue
 
 
 class DataBaseTests : KoinTest {
@@ -47,7 +44,7 @@ class DataBaseTests : KoinTest {
 
     /** Tests most DB functions */
     @Test
-    fun userTest () = runTest {
+    fun userClientTest () = runTest {
 
         // Create a random user
         // Add them to the db
@@ -102,6 +99,77 @@ class DataBaseTests : KoinTest {
 
         assertEquals(ashUser?.name, "Karl", message = "Put Test 1")
         assertEquals(ashUser?.scoopDay, "WEDNESDAY", message = "Put Test 2")
+
+    }
+
+    @Test
+    fun taskClientTest () = runTest {
+        // Add some users to the DB
+        val ashUser = userRemoteManager.registerUser(User(name = "Ashton"))
+        val lukeUser = userRemoteManager.registerUser(User(name = "Luke"))
+
+        // Verify no Tasks are on the DB
+        var tasksOnDB = taskRemoteManager.getAllTasks()
+        assertTrue(tasksOnDB.isEmpty(), message = "Get Tasks Test 1")
+
+        // Add a task to the DB
+        val result = taskRemoteManager.addTask(Task(
+            type="Morning Food",
+            userID = ashUser!!.id,
+            time="TEMP",
+            date="TEMP"
+        ))
+
+        assertTrue(result)
+
+        // Verify there is a task on the DB
+        tasksOnDB = taskRemoteManager.getAllTasks()
+        assertTrue(!tasksOnDB.isEmpty(), message = "Get Tasks Test 2")
+
+        // Get the task from the DB
+        val task = taskRemoteManager.getTask(type="Morning Food")
+
+        // Verify the task is non-null
+        assertNotNull(task)
+
+        // Verify task is correct
+        assertEquals(task.type, "Morning Food")
+        assertEquals(task.date, "TEMP")
+        assertEquals(task.time, "TEMP")
+        assertEquals(task.userID, ashUser.id)
+
+        // Update the task on the DB
+        val newTask = Task(
+            type="Morning Food",
+            userID = lukeUser!!.id,
+            time="RN",
+            date="RN"
+        )
+
+        // Send the task to the DB
+        val updateResult = taskRemoteManager.updateTask(newTask)
+        assertTrue(updateResult)
+
+        // Retrieve the task
+        val returnedTask = taskRemoteManager.getTask(type="Morning Food")
+
+        assertNotNull(returnedTask)
+
+        // Verify information
+        assertEquals(returnedTask.type, "Morning Food")
+        assertEquals(returnedTask.date, "RN")
+        assertEquals(returnedTask.time, "RN")
+        assertEquals(returnedTask.userID, lukeUser.id)
+
+        // Delete the task from the DB
+        taskRemoteManager.removeTask("Morning Food")
+
+        // Verify that searching for the task returns null
+        assertNull(taskRemoteManager.getTask(type="Morning Food"))
+
+        // Verify the database is empty
+        val taskList = taskRemoteManager.getAllTasks()
+        assertTrue(taskList.isEmpty())
 
     }
 }

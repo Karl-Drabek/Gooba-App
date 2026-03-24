@@ -10,6 +10,7 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.*
 import org.koin.dsl.module
 import kotlinx.serialization.json.Json
+import io.ktor.http.*
 
 /** search URLS for database calls */
 val serverUrl = "http://127.0.0.1:1738"
@@ -19,14 +20,15 @@ val postUsersUrl = "$getUsersUrl"
 
 val putUsersUrl = "$getUsersUrl"
 val clearUsersUrl = "$getUsersUrl/admin/clear"
-fun searchUserUrl(name : String) : String = "$getUsersUrl/search/$name"
+fun searchUserUrl(name : String) : String = "$getUsersUrl/search/${name.encodeURLParameter()}"
 
 val getTasksUrl = "$serverUrl/tasks"
 val deleteTasksUrl = "$getTasksUrl"
 val postTasksUrl = "$getTasksUrl"
 val putTasksUrl = "$getTasksUrl"
 val clearTasksUrl = "$deleteTasksUrl/clear"
-fun searchTaskUrl(type: String) : String = "$getTasksUrl/search/$type"
+
+fun searchTaskUrl(type: String) : String = "$getTasksUrl/search/${type.encodeURLParameter()}"
 
 
 val networkModule = module {
