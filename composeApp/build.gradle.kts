@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 kotlin {
@@ -53,11 +54,14 @@ kotlin {
             implementation("io.ktor:ktor-client-logging:${ktorVersion}")
             implementation("io.ktor:ktor-client-content-negotiation:${ktorVersion}")
             implementation("io.ktor:ktor-serialization-kotlinx-json:${ktorVersion}")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
             implementation("io.insert-koin:koin-core:${koinVersion}")
         }
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+            implementation ("io.insert-koin:koin-test:4.0.0")
         }
 
     }

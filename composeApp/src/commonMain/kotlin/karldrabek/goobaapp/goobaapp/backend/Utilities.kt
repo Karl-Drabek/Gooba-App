@@ -10,9 +10,12 @@ import io.ktor.client.*
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import karldrabek.goobaapp.goobaapp.*
+import kotlinx.serialization.json.JsonElement
 
 enum class Mealtime {
     EVENING,
@@ -34,25 +37,91 @@ fun scoop(user: User) {
 
 }
 
-/** Adds a User to the database if it does not exist, always returns the clients user
- * @param name username
- * @return App user
- */
-suspend fun KoinComponent.registerUser (name: String, scoopDay : String = "") : User? {
-    val client : HttpClient by inject()
+object UserRemoteManager: KoinComponent {
 
-    // Get the list of users with matching name from db
-    val users: List<User>? = client.get(searchUserUrl(name)).body()
-    if (!users.isNullOrEmpty() && users.size == 1) {
-        // Return the user
-        return users[0]
-    } else { // User not found in the list
+    /** Adds a User to the database if it does not exist, always returns the clients user
+     * @param user user
+     * @return App user
+     */
+    suspend fun registerUser (user: User) : User? {
+        val client : HttpClient by inject()
+
+        // Get the list of users with matching name from db
+        val users: List<User>? = searchUser(user)
+        if (!users.isNullOrEmpty()) return users[0]
+
         // Return the added user
-        return client.post(postUsersUrl) {
+        val user: User? = client.post(postUsersUrl) {
             contentType(ContentType.Application.Json)
-            setBody(User(name=name, scoopDay=scoopDay))
+            setBody(user)
         }.body()
+
+        return user
     }
+
+    /** Updates a given user on the server
+     * @param user new user credentials, id must remain the same
+     * @return new user information
+     */
+    suspend fun updateUser (user: User) : User? {
+        val client : HttpClient by inject()
+
+        val response: HttpResponse =  client.put(putUsersUrl) {
+            contentType(ContentType.Application.Json)
+            setBody(user)
+        }
+
+        if (response.status == HttpStatusCode.OK) {
+            val users = searchUser(user)
+            if (!users.isNullOrEmpty()) return users[0]
+        }
+        return null
+    }
+
+    /** Searches for a user on the DB */
+    suspend fun searchUser(user: User): List<User>?  {
+        val client : HttpClient by inject()
+        val response = client.get(searchUserUrl(user.name))
+
+        return if (response.status == HttpStatusCode.OK) {
+            // Only try to parse JSON if the server said "OK"
+            response.body<List<User>?>()
+        } else if (response.status == HttpStatusCode.NotFound) {
+            // If 404, just return an empty list instead of crashing
+            emptyList()
+        } else {
+            println("Server Error: ${response.status}")
+            emptyList()
+        }
+    }
+
+    /** =======================================
+     *                  WARNING
+     *  =======================================
+     *     CLEARS ALL USERS IN THE DATABASE
+     */
+    suspend fun clearAllUsers() {
+        val client : HttpClient by inject()
+        client.get(clearUsersUrl)
+    }
+
+    /** Returns all users that exist on the database */
+    suspend fun getAllUsers() : List<User>? {
+        val client : HttpClient by inject()
+        return client.get(getUsersUrl).body()
+    }
+
+    /** Returns true if user is successfully deleted */
+    suspend fun deleteUser(user : User?) : Boolean {
+        val client : HttpClient by inject()
+        val response: HttpResponse = client.delete(deleteUsersUrl) {
+            contentType(ContentType.Application.Json)
+            setBody(user)
+        }
+
+        return response.status == HttpStatusCode.OK
+    }
+
 }
 
 /**

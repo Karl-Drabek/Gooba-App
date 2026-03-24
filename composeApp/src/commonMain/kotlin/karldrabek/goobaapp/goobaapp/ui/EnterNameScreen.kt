@@ -28,11 +28,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import karldrabek.goobaapp.goobaapp.backend.User
-import karldrabek.goobaapp.goobaapp.backend.registerName
+import karldrabek.goobaapp.goobaapp.backend.UserRemoteManager.registerUser
 import karldrabek.goobaapp.goobaapp.ui.theme.ButtonDisabled
 import karldrabek.goobaapp.goobaapp.ui.theme.InputBackground
 import karldrabek.goobaapp.goobaapp.ui.theme.MutedText
 import karldrabek.goobaapp.goobaapp.ui.theme.PrimaryPurple
+import kotlinx.coroutines.launch
+
 /**
  * EnterNameScreen handles the name entry for the first time that
  * the user enters the application
@@ -45,6 +47,7 @@ fun EnterNameScreen(onSave: (User) -> Unit) {
       * the current name in the input box */
     var name by remember { mutableStateOf("") }
     var existingName by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     /** background */
     Box(
@@ -135,12 +138,23 @@ fun EnterNameScreen(onSave: (User) -> Unit) {
                         val trimmed = name.trim()
                         if (trimmed.isEmpty()) return@Button /** labeled return exits  button lambda */
 
-                        if (registerName(trimmed)) {
-                            onSave(User(trimmed))
-                        } else if (existingName) {
-                            onSave(User(trimmed))
-                        } else {
-                            existingName = true
+//                        if (registerName(trimmed)) {
+//                            onSave(User(trimmed))
+//                        } else if (existingName) {
+//                            onSave(User(trimmed))
+//                        } else {
+//                            existingName = true
+//                        }
+
+                        scope.launch {
+                            // Adds a new user, returns the existing user if it exists
+                            val registeredUser = registerUser(User(name = trimmed))
+                            if(registeredUser != null) {
+                                onSave(registeredUser)
+                            } else {
+                                existingName = true
+                            }
+
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),

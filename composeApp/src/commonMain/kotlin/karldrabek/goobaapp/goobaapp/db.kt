@@ -16,6 +16,8 @@ import kotlinx.serialization.json.Json
 val getUsersUrl = "http://127.0.0.1:1738/users"
 val deleteUsersUrl = "$getUsersUrl"
 val postUsersUrl = "$getUsersUrl"
+
+val putUsersUrl = "$getUsersUrl"
 val clearUsersUrl = "$getUsersUrl/admin/clear"
 suspend fun searchUserUrl(name : String) : String = "$getUsersUrl/search/$name"
 
@@ -25,13 +27,13 @@ val networkModule = module {
             install(ContentNegotiation) {
                 json(Json {
                     ignoreUnknownKeys = true
-                    prettyPrint = true
+                    encodeDefaults = true
                 })
             }
 
             install(Logging) {
                 logger = Logger.DEFAULT
-                level = LogLevel.HEADERS
+                level = LogLevel.ALL // 🔥 increase visibility
             }
         }
     }
