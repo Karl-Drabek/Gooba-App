@@ -105,10 +105,7 @@ object TaskRemoteManager : KoinComponent {
      */
     suspend fun getTask(type: String) : Task? {
         val client: HttpClient by inject()
-
         val response : HttpResponse = client.get(searchTaskUrl(type))
-
-
 
         return if (response.status == HttpStatusCode.OK) {
             response.body()
