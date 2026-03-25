@@ -16,6 +16,8 @@ import karldrabek.goobaapp.goobaapp.deleteUsersUrl
 import karldrabek.goobaapp.goobaapp.getUsersUrl
 import karldrabek.goobaapp.goobaapp.postUsersUrl
 import karldrabek.goobaapp.goobaapp.putUsersUrl
+import karldrabek.goobaapp.goobaapp.searchUserByIdUrl
+import karldrabek.goobaapp.goobaapp.searchUserByNameUrl
 import karldrabek.goobaapp.goobaapp.searchUserUrl
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
@@ -46,16 +48,21 @@ object UserRemoteManager: KoinComponent {
         val client : HttpClient by inject()
 
         // Get the list of users with matching name from db
-        val users: List<User>? = searchUser(user)
-        if (!users.isNullOrEmpty()) return users[0]
+        val searchedUser: User? = searchUserById(user.id)
+        if (searchedUser != null) return searchedUser
 
         // Return the added user
-        val user: User? = client.post(postUsersUrl) {
+        val response: HttpResponse = client.post(postUsersUrl) {
             contentType(ContentType.Application.Json)
             setBody(user)
-        }.body()
+        }
 
-        return user
+        return when (response.status) {
+            HttpStatusCode.OK -> response.body()
+            HttpStatusCode.NotFound -> null
+            HttpStatusCode.BadRequest -> null
+            else -> throw Exception("Server Error")
+        }
     }
 
     /** Updates a given user on the server
@@ -71,26 +78,35 @@ object UserRemoteManager: KoinComponent {
         }
 
         if (response.status == HttpStatusCode.OK) {
-            val users = searchUser(user)
-            if (!users.isNullOrEmpty()) return users[0]
+            val user = searchUserById(user.id)
+            if (user != null) return user
         }
+
         return null
     }
 
     /** Searches for a user on the DB */
-    suspend fun searchUser(user: User): List<User>?  {
+    suspend fun searchUserById(id: Int): User?  {
         val client : HttpClient by inject()
-        val response = client.get(searchUserUrl(user.name))
+        val response : HttpResponse = client.get(searchUserByIdUrl(id))
 
-        return if (response.status == HttpStatusCode.OK) {
-            // Only try to parse JSON if the server said "OK"
-            response.body<List<User>?>()
-        } else if (response.status == HttpStatusCode.NotFound) {
-            // If 404, just return an empty list instead of crashing
-            emptyList()
-        } else {
-            println("Server Error: ${response.status}")
-            emptyList()
+        return when (response.status) {
+            HttpStatusCode.OK -> response.body()
+            HttpStatusCode.NotFound -> null
+            HttpStatusCode.BadRequest -> null
+            else -> throw Exception("Unknown Error")
+        }
+    }
+
+    suspend fun searchUsersByName(name: String) : List<User> {
+        val client : HttpClient by inject()
+        val response: HttpResponse = client.get(searchUserByNameUrl(name))
+
+        return when (response.status) {
+            HttpStatusCode.OK -> response.body()
+            HttpStatusCode.NotFound -> emptyList()
+            HttpStatusCode.BadRequest -> emptyList()
+            else -> throw Exception("Server Error")
         }
     }
 
@@ -111,13 +127,9 @@ object UserRemoteManager: KoinComponent {
     }
 
     /** Returns true if user is successfully deleted */
-    suspend fun deleteUser(user : User?) : Boolean {
+    suspend fun deleteUser(id: Int) : Boolean {
         val client : HttpClient by inject()
-        val response: HttpResponse = client.delete(deleteUsersUrl) {
-            contentType(ContentType.Application.Json)
-            setBody(user)
-        }
-
+        val response: HttpResponse = client.delete(deleteUsersUrl(id))
         return response.status == HttpStatusCode.OK
     }
 

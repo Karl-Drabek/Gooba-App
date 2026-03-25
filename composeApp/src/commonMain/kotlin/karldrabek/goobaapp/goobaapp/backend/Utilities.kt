@@ -3,13 +3,39 @@ package karldrabek.goobaapp.goobaapp.backend
 import karldrabek.goobaapp.goobaapp.utils.GoobaTask
 import karldrabek.goobaapp.goobaapp.utils.TaskCompletionDay
 import karldrabek.goobaapp.goobaapp.backend.Task
+import karldrabek.goobaapp.goobaapp.backend.*
 import kotlinx.datetime.*
 import kotlin.time.Instant
 import kotlin.time.Clock
 
+val taskManager = TaskRemoteManager
+val userManager = UserRemoteManager
 
-fun feed(user : User, task: Task,  Instant = Clock.System.now()) {
-    // TODO: add entry to the DB
+fun getDateAndTimeAsString(): Pair<String, String> {
+    val instant = Clock.System.now()
+    val systemTimeZone = TimeZone.currentSystemDefault()
+    val dateAndTime = instant.toLocalDateTime(systemTimeZone)
+    val date = "${dateAndTime.day} : ${dateAndTime.month} : ${dateAndTime.year}"
+    val time = "${dateAndTime.hour} : ${dateAndTime.minute} : ${dateAndTime.second}"
+    return Pair(date, time)
+}
+
+/** @WARNING This needs to be launched in coroutine context
+ *
+ * Sends a completed feed task to the database
+ * @param user User that completed the task
+ * @param task The completed task
+ */
+suspend fun feed(user : User, task: GoobaTask) {
+    val dateAndTime = getDateAndTimeAsString()
+    val dbTask = Task(
+        type=task.toString(),
+        userID=user.id,
+        time=dateAndTime.second,
+        date=dateAndTime.first
+    )
+
+    taskManager.addTask(dbTask)
 }
 
 fun scoop(user: User) {
