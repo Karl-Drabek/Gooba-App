@@ -7,12 +7,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import karldrabek.goobaapp.goobaapp.clearTasksUrl
-import karldrabek.goobaapp.goobaapp.deleteTasksUrl
-import karldrabek.goobaapp.goobaapp.getTasksUrl
-import karldrabek.goobaapp.goobaapp.postTasksUrl
-import karldrabek.goobaapp.goobaapp.putTasksUrl
-import karldrabek.goobaapp.goobaapp.searchTaskUrl
+import karldrabek.goobaapp.goobaapp.*
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -52,32 +47,30 @@ object TaskRemoteManager : KoinComponent {
 
     /** Deletes a task from the DB
      * @param type
+     * @param date date task was completed
      * @return True upon successful deletion
      */
-    suspend fun removeTask(type: String) : Boolean {
-        // Server expects JSON task
-        val bufferTask = Task(type=type, userID=0, date="", time="")
+    suspend fun removeTask(type: String, date: String) : Boolean {
         val client : HttpClient by inject()
-        val response : HttpResponse = client.delete(deleteTasksUrl) {
-            contentType(ContentType.Application.Json)
-            setBody(bufferTask)
-        }
-
+        val response : HttpResponse = client.delete(deleteTasksUrl(date, type))
         return response.status == HttpStatusCode.OK
     }
 
     /** Gets all completed tasks from the DB
      * @return List of tasks
      */
-    suspend fun getAllTasks() : List<Task> {
+    suspend fun getAllTasks() : List<Task>? {
         val client : HttpClient by inject()
-        return client.get(getTasksUrl).body()
+        val tasks: List<Task> = client.get(getTasksUrl).body()
+        return tasks.ifEmpty {
+            null
+        }
+
     }
 
     /** Clears all completed tasks
      * @return true after succesful clear
      */
-
     suspend fun clearAllTasks() : Boolean {
         val client : HttpClient by inject()
         val response : HttpResponse = client.delete(clearTasksUrl)
@@ -99,13 +92,44 @@ object TaskRemoteManager : KoinComponent {
         return response.status == HttpStatusCode.OK
     }
 
-    /** requests a task
-     * @param type Task type to request
-     * @return the task
+    /** Requests the tasks by date
+     * @param date date of completed tasks
+     * @return list of tasks
      */
-    suspend fun getTask(type: String) : Task? {
+    suspend fun getTasksByDate(date: String) : List<Task>? {
+        val client : HttpClient by inject()
+        val response : HttpResponse = client.get(searchTasksByDateUrl(date))
+
+        return if (response.status == HttpStatusCode.OK) {
+            response.body()
+        } else {
+            null
+        }
+    }
+
+    /** Request the tasks by type and date
+     * @param type Type of task
+     * @param date Date of task
+     * @return Task or null if not found
+     */
+    suspend fun getTask(date: String, type: String): Task? {
+        val client : HttpClient by inject()
+        val response : HttpResponse = client.get(searchTasksByTypeAndDateUrl(type, date))
+        return when (response.status) {
+            HttpStatusCode.OK -> response.body()
+            HttpStatusCode.NotFound -> null
+            HttpStatusCode.BadRequest -> null
+            else -> throw Exception("Server Error")
+        }
+    }
+
+    /** requests a task by type
+     * @param type Task type to request
+     * @return list of tasks with given name
+     */
+    suspend fun getTasksByType(type: String) : List<Task>? {
         val client: HttpClient by inject()
-        val response : HttpResponse = client.get(searchTaskUrl(type))
+        val response : HttpResponse = client.get(searchTasksByTypeUrl(type))
 
         return if (response.status == HttpStatusCode.OK) {
             response.body()

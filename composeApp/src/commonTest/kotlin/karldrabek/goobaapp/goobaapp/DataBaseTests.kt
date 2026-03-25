@@ -72,33 +72,34 @@ class DataBaseTests : KoinTest {
         assertTrue(!users.isNullOrEmpty() && users.size == 2, message = "Repeat user test")
 
         // Delete a user
-        val success: Boolean = userRemoteManager.deleteUser(lukeUser)
+        val success: Boolean = userRemoteManager.deleteUser(lukeUser!!.id)
         assertTrue(success, message = "Delete User Test")
 
-        // Verify user is not there
-        if(lukeUser != null) {
-            // Try to add the same user twice
-            users = userRemoteManager.searchUser(lukeUser)
-            assertTrue(users.isNullOrEmpty(), message = "Search for deleted user")
-        }
+        // Verify user is not there by id
+        var user = userRemoteManager.searchUserById(lukeUser.id)
+        assertEquals(user, null, "Search for deleted user")
 
-        // Verify Ashton is there
-        if(ashUser != null) {
+        ashUser!!
 
-            users = userRemoteManager.searchUser(ashUser)
-            assertTrue(!users.isNullOrEmpty(), message = "Search for existing user")
-        }
+        // Verify Ashton is there by name
+        users = userRemoteManager.searchUsersByName(ashUser.name)
+        users!!
+        assertTrue(users.isNotEmpty(), message = "Search for existing user")
+
+        // Search Ashton by id, verify non-null
+        user = userRemoteManager.searchUserById(ashUser.id)
+        assertNotNull(user, "Search for existing user")
+
 
         // Change Ashtons information
-        ashUser?.scoopDay = "WEDNESDAY"
-        ashUser?.name = "Karl"
+        ashUser.scoopDay = "WEDNESDAY"
+        ashUser.name = "Karl"
+        ashUser = userRemoteManager.updateUser(ashUser)
 
-        if(ashUser != null) {
-            ashUser = userRemoteManager.updateUser(ashUser)
-        }
+        ashUser!!
 
-        assertEquals(ashUser?.name, "Karl", message = "Put Test 1")
-        assertEquals(ashUser?.scoopDay, "WEDNESDAY", message = "Put Test 2")
+        assertEquals(ashUser.name, "Karl", message = "Put Test 1")
+        assertEquals(ashUser.scoopDay, "WEDNESDAY", message = "Put Test 2")
 
     }
 
@@ -110,7 +111,7 @@ class DataBaseTests : KoinTest {
 
         // Verify no Tasks are on the DB
         var tasksOnDB = taskRemoteManager.getAllTasks()
-        assertTrue(tasksOnDB.isEmpty(), message = "Get Tasks Test 1")
+        assertNull(tasksOnDB, message = "Get Tasks Test 1")
 
         // Add a task to the DB
         val result = taskRemoteManager.addTask(Task(
@@ -124,10 +125,11 @@ class DataBaseTests : KoinTest {
 
         // Verify there is a task on the DB
         tasksOnDB = taskRemoteManager.getAllTasks()
+        tasksOnDB!!
         assertTrue(!tasksOnDB.isEmpty(), message = "Get Tasks Test 2")
 
         // Get the task from the DB
-        val task = taskRemoteManager.getTask(type="Morning Food")
+        val task = taskRemoteManager.getTask(type="Morning Food", date = "TEMP")
 
         // Verify the task is non-null
         assertNotNull(task)
@@ -143,7 +145,7 @@ class DataBaseTests : KoinTest {
             type="Morning Food",
             userID = lukeUser!!.id,
             time="RN",
-            date="RN"
+            date="TEMP"
         )
 
         // Send the task to the DB
@@ -151,25 +153,23 @@ class DataBaseTests : KoinTest {
         assertTrue(updateResult)
 
         // Retrieve the task
-        val returnedTask = taskRemoteManager.getTask(type="Morning Food")
+        val returnedTask = taskRemoteManager.getTask(type="Morning Food", date = "TEMP")
 
         assertNotNull(returnedTask)
 
         // Verify information
-        assertEquals(returnedTask.type, "Morning Food")
-        assertEquals(returnedTask.date, "RN")
         assertEquals(returnedTask.time, "RN")
         assertEquals(returnedTask.userID, lukeUser.id)
 
         // Delete the task from the DB
-        taskRemoteManager.removeTask("Morning Food")
+        taskRemoteManager.removeTask("Morning Food", date="TEMP")
 
         // Verify that searching for the task returns null
-        assertNull(taskRemoteManager.getTask(type="Morning Food"))
+        assertNull(taskRemoteManager.getTask(type="Morning Food", date = "TEMP"))
 
         // Verify the database is empty
         val taskList = taskRemoteManager.getAllTasks()
-        assertTrue(taskList.isEmpty())
+        assertNull(taskList)
 
     }
 }

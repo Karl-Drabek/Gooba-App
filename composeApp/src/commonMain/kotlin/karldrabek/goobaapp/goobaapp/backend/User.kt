@@ -58,8 +58,8 @@ object UserRemoteManager: KoinComponent {
         }
 
         return when (response.status) {
-            HttpStatusCode.OK -> response.body()
-            HttpStatusCode.NotFound -> null
+            HttpStatusCode.Created -> response.body()
+            HttpStatusCode.NotImplemented -> null
             HttpStatusCode.BadRequest -> null
             else -> throw Exception("Server Error")
         }
@@ -98,14 +98,14 @@ object UserRemoteManager: KoinComponent {
         }
     }
 
-    suspend fun searchUsersByName(name: String) : List<User> {
+    suspend fun searchUsersByName(name: String) : List<User>? {
         val client : HttpClient by inject()
         val response: HttpResponse = client.get(searchUserByNameUrl(name))
 
         return when (response.status) {
             HttpStatusCode.OK -> response.body()
-            HttpStatusCode.NotFound -> emptyList()
-            HttpStatusCode.BadRequest -> emptyList()
+            HttpStatusCode.NotFound -> null
+            HttpStatusCode.BadRequest -> null
             else -> throw Exception("Server Error")
         }
     }
@@ -123,7 +123,11 @@ object UserRemoteManager: KoinComponent {
     /** Returns all users that exist on the database */
     suspend fun getAllUsers() : List<User>? {
         val client : HttpClient by inject()
-        return client.get(getUsersUrl).body()
+        val users : List<User> = client.get(getUsersUrl).body()
+
+        return users.ifEmpty {
+            null
+        }
     }
 
     /** Returns true if user is successfully deleted */
@@ -132,5 +136,4 @@ object UserRemoteManager: KoinComponent {
         val response: HttpResponse = client.delete(deleteUsersUrl(id))
         return response.status == HttpStatusCode.OK
     }
-
 }

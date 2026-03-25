@@ -32,7 +32,7 @@ val searchTasksUrl = "$getTasksUrl/search"
 fun deleteTasksUrl(date:String, type:String) = "$getTasksUrl/${date.encodeURLParameter()}/${type.encodeURLParameter()}"
 val postTasksUrl = "$getTasksUrl"
 val putTasksUrl = "$getTasksUrl"
-val clearTasksUrl = "$getUsersUrl/clear"
+val clearTasksUrl = "$getTasksUrl/clear"
 
 fun searchTasksByTypeUrl(type: String) : String = "$searchTasksUrl/type/${type.encodeURLParameter()}"
 fun searchTasksByDateUrl(date: String) : String = "$searchTasksUrl/date/${date.encodeURLParameter()}"
