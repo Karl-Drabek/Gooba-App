@@ -59,7 +59,7 @@ import karldrabek.goobaapp.goobaapp.ui.theme.PrimaryPurple
 import karldrabek.goobaapp.goobaapp.ui.utils.DropDown
 import karldrabek.goobaapp.goobaapp.ui.utils.NameEntryBox
 import karldrabek.goobaapp.goobaapp.ui.utils.PopUp
-import karldrabek.goobaapp.goobaapp.utils.Task
+import karldrabek.goobaapp.goobaapp.utils.GoobaTask
 import karldrabek.goobaapp.goobaapp.ui.utils.TimeDropDown
 import karldrabek.goobaapp.goobaapp.utils.EventCompletedData
 import karldrabek.goobaapp.goobaapp.utils.TimeFormat
@@ -89,9 +89,9 @@ fun MainScreen(
     var morningFoodData: EventCompletedData? by remember { mutableStateOf(null) }
     var eveningFoodData: EventCompletedData? by remember { mutableStateOf(null) }
     var poopScoopData: EventCompletedData? by remember { mutableStateOf(null) }
-    var editTask: Task? by remember { mutableStateOf(null) }
+    var editTask: GoobaTask? by remember { mutableStateOf(null) }
 
-    val editTaskConst: Task? = editTask
+    val editTaskConst: GoobaTask? = editTask
 
     /** layout elements on top of each other */
     Column(
@@ -114,7 +114,7 @@ fun MainScreen(
                 completeTitle = "Morning - Fed ✓",
                 badgeBackground = MorningBadgeBg,
                 badgeForeground = MorningBadgeFg,
-                onEditClick = { editTask = Task.MORNING_FOOD },
+                onEditClick = { editTask = GoobaTask.MORNING_FOOD },
                 onClick = { morningFoodData = EventCompletedData(user.name, Clock.System.now()) },
                 icon = {
                     Icon(
@@ -132,7 +132,7 @@ fun MainScreen(
                 badgeBackground = EveningBadgeBg,
                 badgeForeground = EveningBadgeFg,
                 onClick = { eveningFoodData = EventCompletedData(user.name, Clock.System.now()) },
-                onEditClick = { editTask = Task.EVENING_FOOD },
+                onEditClick = { editTask = GoobaTask.EVENING_FOOD },
                 icon = {
                     Icon(
                         imageVector = Icons.Outlined.Bedtime,
@@ -154,7 +154,7 @@ fun MainScreen(
                 badgeBackground = LitterBadgeBg,
                 badgeForeground = LitterBadgeFg,
                 onClick = { poopScoopData = EventCompletedData(user.name, Clock.System.now()) },
-                onEditClick = { editTask = Task.SCOOP_POOP },
+                onEditClick = { editTask = GoobaTask.SCOOP_POOP },
                 icon = {
                     Icon(
                         imageVector = Icons.Outlined.DeleteOutline,
@@ -170,9 +170,9 @@ fun MainScreen(
         /** get the data in question and make sure it won't change so we can
          * verify that it is not null */
         val dataConst = when (editTaskConst) {
-            Task.MORNING_FOOD -> morningFoodData
-            Task.EVENING_FOOD -> eveningFoodData
-            Task.SCOOP_POOP -> poopScoopData
+            GoobaTask.MORNING_FOOD -> morningFoodData
+            GoobaTask.EVENING_FOOD -> eveningFoodData
+            GoobaTask.SCOOP_POOP -> poopScoopData
         }
 
         /** popup that updates data accordingly */
@@ -184,9 +184,9 @@ fun MainScreen(
                 },
                 onUpdateData = {
                     when(editTaskConst){
-                        Task.MORNING_FOOD -> morningFoodData = it
-                        Task.EVENING_FOOD -> eveningFoodData = it
-                        Task.SCOOP_POOP -> poopScoopData = it
+                        GoobaTask.MORNING_FOOD -> morningFoodData = it
+                        GoobaTask.EVENING_FOOD -> eveningFoodData = it
+                        GoobaTask.SCOOP_POOP -> poopScoopData = it
                     }
                     editTask = null
                 }

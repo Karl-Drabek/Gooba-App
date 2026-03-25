@@ -1,17 +1,14 @@
 package karldrabek.goobaapp.goobaapp.backend
 
-import karldrabek.goobaapp.goobaapp.utils.Task
+import karldrabek.goobaapp.goobaapp.utils.GoobaTask
 import karldrabek.goobaapp.goobaapp.utils.TaskCompletionDay
+import karldrabek.goobaapp.goobaapp.backend.Task
 import kotlinx.datetime.*
 import kotlin.time.Instant
 import kotlin.time.Clock
 
-enum class Mealtime {
-    EVENING,
-    MORNING
-}
 
-fun feed(user : User, mealtime: Mealtime, time: Instant = Clock.System.now()) {
+fun feed(user : User, task: Task,  Instant = Clock.System.now()) {
     // TODO: add entry to the DB
 }
 
