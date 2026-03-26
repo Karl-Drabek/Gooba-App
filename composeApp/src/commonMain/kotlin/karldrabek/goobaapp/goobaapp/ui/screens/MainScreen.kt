@@ -2,6 +2,7 @@ package karldrabek.goobaapp.goobaapp.ui.screens
 
 
 import androidx.compose.foundation.BorderStroke
+import karldrabek.goobaapp.goobaapp.backend.Task
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,9 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bedtime
 import androidx.compose.material.icons.outlined.Cancel
@@ -48,27 +47,17 @@ import karldrabek.goobaapp.goobaapp.ui.theme.LitterBadgeBg
 import karldrabek.goobaapp.goobaapp.ui.theme.LitterBadgeFg
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Save
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.window.Dialog
-import karldrabek.goobaapp.goobaapp.ui.theme.InputBackground
-import karldrabek.goobaapp.goobaapp.ui.theme.MutedText
-import karldrabek.goobaapp.goobaapp.ui.theme.PrimaryPurple
-import karldrabek.goobaapp.goobaapp.ui.utils.DropDown
+import karldrabek.goobaapp.goobaapp.backend.getDateAndTimeAsString
 import karldrabek.goobaapp.goobaapp.ui.utils.NameEntryBox
 import karldrabek.goobaapp.goobaapp.ui.utils.PopUp
 import karldrabek.goobaapp.goobaapp.utils.GoobaTask
 import karldrabek.goobaapp.goobaapp.ui.utils.TimeDropDown
 import karldrabek.goobaapp.goobaapp.utils.EventCompletedData
-import karldrabek.goobaapp.goobaapp.utils.TimeFormat
 import karldrabek.goobaapp.goobaapp.utils.timeToValues
 import karldrabek.goobaapp.goobaapp.utils.valuesToTime
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Instant
 
 /**
  * MainScreen handles the main screen for the gooba app
@@ -82,8 +71,11 @@ import kotlin.time.Instant
 @Composable
 fun MainScreen(
     user: User,
+    registerTask: (Task) -> Unit,
+    updateTask: (Task) -> Unit,
+    deleteTask: (Task) -> Unit,
     onOpenSettings: () -> Unit,
-    onOpenHistory: () -> Unit,
+    onOpenHistory: () -> Unit
 ) {
     /** State */
     var morningFoodData: EventCompletedData? by remember { mutableStateOf(null) }
@@ -115,7 +107,18 @@ fun MainScreen(
                 badgeBackground = MorningBadgeBg,
                 badgeForeground = MorningBadgeFg,
                 onEditClick = { editTask = GoobaTask.MORNING_FOOD },
-                onClick = { morningFoodData = EventCompletedData(user.name, Clock.System.now()) },
+                onClick = {
+                    // TODO implement the other passed in functions and generalize this to all the task types
+                    val clockSnap = Clock.System.now()
+                    val dateTime = getDateAndTimeAsString(clockSnap)
+                    registerTask(Task(
+                        GoobaTask.MORNING_FOOD.toString(),
+                        user.id,
+                        dateTime.first,
+                        dateTime.second)
+                    )
+                    morningFoodData = EventCompletedData(user.name, clockSnap)
+                          },
                 icon = {
                     Icon(
                         imageVector = Icons.Outlined.WbSunny,

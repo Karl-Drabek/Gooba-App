@@ -11,10 +11,11 @@ import kotlin.time.Clock
 val taskManager = TaskRemoteManager
 val userManager = UserRemoteManager
 
-fun getDateAndTimeAsString(): Pair<String, String> {
-    val instant = Clock.System.now()
+
+
+fun getDateAndTimeAsString(time: Instant): Pair<String, String> {
     val systemTimeZone = TimeZone.currentSystemDefault()
-    val dateAndTime = instant.toLocalDateTime(systemTimeZone)
+    val dateAndTime = time.toLocalDateTime(systemTimeZone)
     val date = "${dateAndTime.day} : ${dateAndTime.month} : ${dateAndTime.year}"
     val time = "${dateAndTime.hour} : ${dateAndTime.minute} : ${dateAndTime.second}"
     return Pair(date, time)
@@ -27,7 +28,7 @@ fun getDateAndTimeAsString(): Pair<String, String> {
  * @param task The completed task
  */
 suspend fun feed(user : User, task: GoobaTask) {
-    val dateAndTime = getDateAndTimeAsString()
+    val dateAndTime = getDateAndTimeAsString(Clock.System.now())
     val dbTask = Task(
         type=task.toString(),
         userID=user.id,

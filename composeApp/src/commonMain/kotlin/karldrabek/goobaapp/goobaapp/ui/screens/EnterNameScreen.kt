@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Pets
 import androidx.compose.material3.Button
@@ -19,21 +18,15 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import karldrabek.goobaapp.goobaapp.backend.User
-import karldrabek.goobaapp.goobaapp.backend.UserRemoteManager.registerUser
 import karldrabek.goobaapp.goobaapp.ui.theme.ButtonDisabled
-import karldrabek.goobaapp.goobaapp.ui.theme.InputBackground
 import karldrabek.goobaapp.goobaapp.ui.theme.MutedText
 import karldrabek.goobaapp.goobaapp.ui.theme.PrimaryPurple
-import kotlinx.coroutines.launch
 
 import karldrabek.goobaapp.goobaapp.ui.utils.NameEntryBox
 
@@ -44,12 +37,13 @@ import karldrabek.goobaapp.goobaapp.ui.utils.NameEntryBox
  *  @property onSave called to save a particular username for the user.
  */
 @Composable
-fun EnterNameScreen(onSave: (User) -> Unit) {
+fun EnterNameScreen(
+    onSave: (User) -> Unit,
+    validName: (String) -> Boolean
+) {
     /** Save whether the user entered and existing name, and
       * the current name in the input box */
     var name by remember { mutableStateOf("") }
-    var existingName by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
 
     /** background */
     Box(
@@ -108,35 +102,14 @@ fun EnterNameScreen(onSave: (User) -> Unit) {
 
                 NameEntryBox(name){
                     name = it
-                    existingName = false
                 }
 
                 Button(
                     onClick = {
-                        val trimmed = name.trim()
-                        if (trimmed.isEmpty()) return@Button /** labeled return exits  button lambda */
-
-                        // TODO -> LUKE FUCKED THIS UP FR !!
-
-//                        if (false) {
-//                            onSave(User(trimmed))
-//                        } else if (existingName) {
-//                            onSave(User(trimmed))
-//                        } else {
-//                            existingName = true
-//                        }
-
-                        // The scope is a mutex, db requires Coroutines which are threads
-                        scope.launch {
-                            // Adds a new user, returns the existing user if it exists
-                            val registeredUser = registerUser(User(name = trimmed))
-                            if(registeredUser != null) {
-                                onSave(registeredUser)
-                            } else {
-                                existingName = true
-                            }
+                        if(validName(name))
+                        {
+                            onSave(User(name))
                         }
-
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
@@ -147,7 +120,7 @@ fun EnterNameScreen(onSave: (User) -> Unit) {
                     enabled = name.trim().isNotEmpty()
                 ) {
                     Text(
-                        text = if (existingName) "Use existing name" else "Continue",
+                        text = if(validName(name)) "Continue" else "Name already exists",
                         modifier = Modifier.padding(vertical = 6.dp),
                         style = MaterialTheme.typography.labelLarge
                     )
