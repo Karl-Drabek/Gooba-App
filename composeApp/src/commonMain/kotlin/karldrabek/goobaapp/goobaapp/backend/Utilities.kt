@@ -11,24 +11,24 @@ import kotlin.time.Clock
 val taskManager = TaskRemoteManager
 val userManager = UserRemoteManager
 
-
-
-fun getDateAndTimeAsString(time: Instant): Pair<String, String> {
+fun getDateAndTimeAsString(instant: Instant = Clock.System.now()): Pair<String, String> {
     val systemTimeZone = TimeZone.currentSystemDefault()
-    val dateAndTime = time.toLocalDateTime(systemTimeZone)
+    val dateAndTime = instant.toLocalDateTime(systemTimeZone)
     val date = "${dateAndTime.day} : ${dateAndTime.month} : ${dateAndTime.year}"
     val time = "${dateAndTime.hour} : ${dateAndTime.minute} : ${dateAndTime.second}"
     return Pair(date, time)
 }
 
-/** @WARNING This needs to be launched in coroutine context
+/**
  *
  * Sends a completed feed task to the database
  * @param user User that completed the task
  * @param task The completed task
  */
 suspend fun feed(user : User, task: GoobaTask) {
-    val dateAndTime = getDateAndTimeAsString(Clock.System.now())
+
+    // Crate Completed Task
+    val dateAndTime = getDateAndTimeAsString()
     val dbTask = Task(
         type=task.toString(),
         userID=user.id,
@@ -36,10 +36,13 @@ suspend fun feed(user : User, task: GoobaTask) {
         date=dateAndTime.first
     )
 
+    // Send to DB
     taskManager.addTask(dbTask)
 }
 
+// TODO
 fun scoop(user: User) {
+
     // Check the day
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
     if (user.scoopDay.uppercase() != today.dayOfWeek.toString().uppercase()) {
@@ -48,25 +51,34 @@ fun scoop(user: User) {
 }
 
 /**
- * Edits a task with the same taskID to a new user and time
+ * Edits a task with the same taskID to a new user and time, sets time to time this function was called
  *
- * @param taskID the ID associated with the task
+ * @param type the ID associated with the task
  * @param userID the ID associated with the new user who will be marked as having completed the task
- * @param time the new time at which the task was completed
- * @TODO @param date
+ * @param date the date to be changed
  */
-fun editTask(taskID: Int, userID: Int, time: Instant){
-    // TODO
+suspend fun editTask(type: String, userID: Int, date: String){
+
+    val dateAndTime = getDateAndTimeAsString()
+    val bufferTask = Task(
+        type=type,
+        userID=userID,
+        date=date,
+        time=dateAndTime.second,
+    )
+
+    // Update the task on the DB
+    taskManager.updateTask(bufferTask)
 }
 
 /**
  * deletes a task completion from the database entirely
  *
- * @param taskID the taskID associated with the task which will be deleted
+ * @param type the taskID associated with the task which will be deleted
+ * @param date the date of task to be deleted
  */
-fun deleteTask(taskID: Int){
-    // TODO
-}
+suspend fun deleteTask(type: String, date: String) = taskManager.removeTask(type, date)
+
 
 /**
  * Gets a TaskCompletionDay with the three events in a day, possibly null
