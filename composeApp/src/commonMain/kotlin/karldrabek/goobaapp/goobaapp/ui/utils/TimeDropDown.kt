@@ -13,12 +13,11 @@ fun TimeDropDown(
     hour: Int,
     minute: Int,
     amPm: String,
-    onTimeChange: (TimeFormat) -> Unit
-){
-
+    onTimeChange: (TimeFormat) -> Unit,
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         /** Hour dropdown */
         DropDown(
@@ -36,7 +35,7 @@ fun TimeDropDown(
             selected = minute,
             onSelected = { onTimeChange(TimeFormat(hour, it, amPm)) },
             modifier = Modifier.weight(1f),
-            formatter = { minute -> minute.toString().padStart(2, '0') }
+            formatter = { minute -> minute.toString().padStart(2, '0') },
         )
 
         /** AM/PM dropdown */
@@ -45,7 +44,7 @@ fun TimeDropDown(
             options = listOf("AM", "PM"),
             selected = amPm,
             onSelected = { onTimeChange(TimeFormat(hour, minute, it)) },
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
     }
 }

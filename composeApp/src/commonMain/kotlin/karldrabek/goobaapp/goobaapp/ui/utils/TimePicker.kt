@@ -7,4 +7,7 @@ package karldrabek.goobaapp.goobaapp.ui.utils
  *  @param context
  *  @param onTimePicked when the time is selected it calls onTimePicked with the current time in HH:MM
  */
-expect fun pickTime(context: Any?, onTimePicked: (String) -> Unit)
+expect fun pickTime(
+    context: Any?,
+    onTimePicked: (String) -> Unit,
+)

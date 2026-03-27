@@ -11,14 +11,6 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import karldrabek.goobaapp.goobaapp.clearUsersUrl
-import karldrabek.goobaapp.goobaapp.deleteUsersUrl
-import karldrabek.goobaapp.goobaapp.getUsersUrl
-import karldrabek.goobaapp.goobaapp.postUsersUrl
-import karldrabek.goobaapp.goobaapp.putUsersUrl
-import karldrabek.goobaapp.goobaapp.searchUserByIdUrl
-import karldrabek.goobaapp.goobaapp.searchUserByNameUrl
-import karldrabek.goobaapp.goobaapp.searchUserUrl
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -32,30 +24,32 @@ import kotlin.getValue
  * @constructor Creates a user with a name who is assigned to no day to scoop poop.
  */
 @Serializable
-data class User(var name: String, var scoopDay: String = "", var id:Int=0){
-    override fun toString(): String {
-        return name
-    }
+data class User(
+    var name: String,
+    var scoopDay: String = "",
+    var id: Int = 0,
+) {
+    override fun toString(): String = name
 }
 
-object UserRemoteManager: KoinComponent {
-
+object UserRemoteManager : KoinComponent {
     /** Adds a User to the database if it does not exist, always returns the clients user
      * @param user user
      * @return App user
      */
-    suspend fun registerUser (user: User) : User? {
-        val client : HttpClient by inject()
+    suspend fun registerUser(user: User): User? {
+        val client: HttpClient by inject()
 
         // Get the list of users with matching name from db
         val searchedUser: User? = searchUserById(user.id)
         if (searchedUser != null) return searchedUser
 
         // Return the added user
-        val response: HttpResponse = client.post(postUsersUrl) {
-            contentType(ContentType.Application.Json)
-            setBody(user)
-        }
+        val response: HttpResponse =
+            client.post(postUsersUrl) {
+                contentType(ContentType.Application.Json)
+                setBody(user)
+            }
 
         return when (response.status) {
             HttpStatusCode.Created -> response.body()
@@ -69,13 +63,14 @@ object UserRemoteManager: KoinComponent {
      * @param user new user credentials, id must remain the same
      * @return new user information
      */
-    suspend fun updateUser (user: User) : User? {
-        val client : HttpClient by inject()
+    suspend fun updateUser(user: User): User? {
+        val client: HttpClient by inject()
 
-        val response: HttpResponse =  client.put(putUsersUrl) {
-            contentType(ContentType.Application.Json)
-            setBody(user)
-        }
+        val response: HttpResponse =
+            client.put(putUsersUrl) {
+                contentType(ContentType.Application.Json)
+                setBody(user)
+            }
 
         if (response.status == HttpStatusCode.OK) {
             val user = searchUserById(user.id)
@@ -86,9 +81,9 @@ object UserRemoteManager: KoinComponent {
     }
 
     /** Searches for a user on the DB */
-    suspend fun searchUserById(id: Int): User?  {
-        val client : HttpClient by inject()
-        val response : HttpResponse = client.get(searchUserByIdUrl(id))
+    suspend fun searchUserById(id: Int): User? {
+        val client: HttpClient by inject()
+        val response: HttpResponse = client.get(searchUserByIdUrl(id))
 
         return when (response.status) {
             HttpStatusCode.OK -> response.body()
@@ -98,8 +93,8 @@ object UserRemoteManager: KoinComponent {
         }
     }
 
-    suspend fun searchUsersByName(name: String) : List<User>? {
-        val client : HttpClient by inject()
+    suspend fun searchUsersByName(name: String): List<User>? {
+        val client: HttpClient by inject()
         val response: HttpResponse = client.get(searchUserByNameUrl(name))
 
         return when (response.status) {
@@ -116,14 +111,14 @@ object UserRemoteManager: KoinComponent {
      *     CLEARS ALL USERS IN THE DATABASE
      */
     suspend fun clearAllUsers() {
-        val client : HttpClient by inject()
+        val client: HttpClient by inject()
         client.get(clearUsersUrl)
     }
 
     /** Returns all users that exist on the database */
-    suspend fun getAllUsers() : List<User>? {
-        val client : HttpClient by inject()
-        val users : List<User> = client.get(getUsersUrl).body()
+    suspend fun getAllUsers(): List<User>? {
+        val client: HttpClient by inject()
+        val users: List<User> = client.get(getUsersUrl).body()
 
         return users.ifEmpty {
             null
@@ -131,8 +126,8 @@ object UserRemoteManager: KoinComponent {
     }
 
     /** Returns true if user is successfully deleted */
-    suspend fun deleteUser(id: Int) : Boolean {
-        val client : HttpClient by inject()
+    suspend fun deleteUser(id: Int): Boolean {
+        val client: HttpClient by inject()
         val response: HttpResponse = client.delete(deleteUsersUrl(id))
         return response.status == HttpStatusCode.OK
     }

@@ -1,7 +1,7 @@
 package karldrabek.goobaapp.goobaapp.state
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +14,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
-class AppViewModel(private val sessionStorage: SessionStorage) : ViewModel() {
+class AppViewModel(
+    private val sessionStorage: SessionStorage,
+) : ViewModel() {
     var uiState by mutableStateOf<AppUiState>(AppUiState.Loading)
         private set
 
@@ -28,11 +30,11 @@ class AppViewModel(private val sessionStorage: SessionStorage) : ViewModel() {
                     val users = usersDeferred.await()
                     val tasks = tasksDeferred.await()
 
-                    if(users ==  null){
+                    if (users == null) {
                         uiState = AppUiState.Error("Users not found")
-                    }else if(tasks == null){
+                    } else if (tasks == null) {
                         uiState = AppUiState.Error("Tasks not found")
-                    }else{
+                    } else {
                         val savedUserId = sessionStorage.getSavedUserId()
 
                         val savedUser = users.find { it.id == savedUserId }
@@ -41,19 +43,20 @@ class AppViewModel(private val sessionStorage: SessionStorage) : ViewModel() {
                             sessionStorage.clearSavedUserId()
                         }
 
-                        uiState = if (savedUser != null) {
-                            AppUiState.Ready(
-                                currentScreen = AppScreen.MAIN_MENU,
-                                currentUser = savedUser,
-                                users = users,
-                                tasks = tasks
-                            )
-                        } else {
-                            AppUiState.NameEntry(
-                                users = users,
-                                tasks = tasks
-                            )
-                        }
+                        uiState =
+                            if (savedUser != null) {
+                                AppUiState.Ready(
+                                    currentScreen = AppScreen.MAIN_MENU,
+                                    currentUser = savedUser,
+                                    users = users,
+                                    tasks = tasks,
+                                )
+                            } else {
+                                AppUiState.NameEntry(
+                                    users = users,
+                                    tasks = tasks,
+                                )
+                            }
                     }
                 }
             } catch (e: Exception) {
@@ -62,22 +65,22 @@ class AppViewModel(private val sessionStorage: SessionStorage) : ViewModel() {
         }
     }
 
-    fun validName(name: String): Boolean {
-        return when (val state = uiState) {
+    fun validName(name: String): Boolean =
+        when (val state = uiState) {
             is AppUiState.Ready -> {
                 !state.users.any { user -> user.name == name }
             }
+
             is AppUiState.NameEntry -> {
                 !state.users.any { user -> user.name == name }
             }
+
             else -> {
                 false
             }
         }
-    }
 
     fun registerUser(user: User) {
-
         viewModelScope.launch {
             val state = uiState
             try {
@@ -92,20 +95,22 @@ class AppViewModel(private val sessionStorage: SessionStorage) : ViewModel() {
 
                 when (state) {
                     is AppUiState.NameEntry -> {
-                        uiState = AppUiState.Ready(
-                            currentScreen = AppScreen.MAIN_MENU,
-                            currentUser = newUser,
-                            users = state.users + newUser,
-                            tasks = state.tasks
-                        )
+                        uiState =
+                            AppUiState.Ready(
+                                currentScreen = AppScreen.MAIN_MENU,
+                                currentUser = newUser,
+                                users = state.users + newUser,
+                                tasks = state.tasks,
+                            )
                     }
 
                     is AppUiState.Ready -> {
-                        uiState = state.copy(
-                            currentUser = newUser,
-                            currentScreen = AppScreen.MAIN_MENU,
-                            users = state.users + newUser
-                        )
+                        uiState =
+                            state.copy(
+                                currentUser = newUser,
+                                currentScreen = AppScreen.MAIN_MENU,
+                                users = state.users + newUser,
+                            )
                     }
 
                     else -> {
@@ -121,9 +126,10 @@ class AppViewModel(private val sessionStorage: SessionStorage) : ViewModel() {
     fun goTo(newScreen: AppScreen) {
         val state = uiState
         if (state is AppUiState.Ready) {
-            uiState = state.copy(
-                currentScreen = newScreen
-            )
+            uiState =
+                state.copy(
+                    currentScreen = newScreen,
+                )
         }
     }
 
@@ -180,11 +186,11 @@ class AppViewModel(private val sessionStorage: SessionStorage) : ViewModel() {
 
                 if (newUser == null) {
                     uiState = AppUiState.Error("Failed to update user")
-
                 } else if (state is AppUiState.Ready) {
-                    uiState = state.copy(
-                        currentUser = newUser
-                    )
+                    uiState =
+                        state.copy(
+                            currentUser = newUser,
+                        )
                 }
             } catch (e: Exception) {
                 uiState = AppUiState.Error("Failed to update user: ${e.message}")
@@ -197,17 +203,19 @@ class AppViewModel(private val sessionStorage: SessionStorage) : ViewModel() {
 
         val state = uiState
         if (state is AppUiState.Ready) {
-            uiState = state.copy(
-                currentUser = user,
-                currentScreen = AppScreen.MAIN_MENU
-            )
-        }else if (state is AppUiState.NameEntry) {
-            uiState = AppUiState.Ready(
-                currentUser = user,
-                currentScreen = AppScreen.MAIN_MENU,
-                users = state.users,
-                tasks = state.tasks
-            )
+            uiState =
+                state.copy(
+                    currentUser = user,
+                    currentScreen = AppScreen.MAIN_MENU,
+                )
+        } else if (state is AppUiState.NameEntry) {
+            uiState =
+                AppUiState.Ready(
+                    currentUser = user,
+                    currentScreen = AppScreen.MAIN_MENU,
+                    users = state.users,
+                    tasks = state.tasks,
+                )
         }
     }
 
@@ -216,10 +224,11 @@ class AppViewModel(private val sessionStorage: SessionStorage) : ViewModel() {
 
         val state = uiState
         if (state is AppUiState.Ready) {
-            uiState = AppUiState.NameEntry(
-                users = state.users,
-                tasks = state.tasks
-            )
+            uiState =
+                AppUiState.NameEntry(
+                    users = state.users,
+                    tasks = state.tasks,
+                )
         }
     }
 }

@@ -43,21 +43,22 @@ import karldrabek.goobaapp.goobaapp.ui.theme.PrimaryPurple
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    user: User, onExit: () -> Unit,
+    user: User,
+    onExit: () -> Unit,
     onSaveClicked: (User) -> Unit,
-    onLogout: () -> Unit) {
+    onLogout: () -> Unit,
+) {
     var expanded by remember { mutableStateOf(false) }
     var newUser by remember { mutableStateOf(user) }
     val options = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
-
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     )
-
     {
         Row {
             IconButton(onClick = onExit) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back") }
@@ -71,43 +72,45 @@ fun SettingsScreen(
 
         // gooba poop day luke gay ---> Kearnan GAYER --> Kearnan GAYEST --> doesnt rhyme faggot
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+            contentAlignment = Alignment.Center,
         ) {
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .widthIn(max = 680.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .widthIn(max = 680.dp),
                 /** set max size */
                 shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                    /** white */
-                ),
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        /** white */
+                    ),
                 /** Cards are raised by default with a shadow, so we remove it */
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 )
                 {
                     Text(
                         text = "Poop Scoop Day Changer",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
 
                     ExposedDropdownMenuBox(
                         expanded = expanded,
-                        onExpandedChange = { expanded = !expanded }
+                        onExpandedChange = { expanded = !expanded },
                     ) {
-
-
                         OutlinedTextField(
                             value = newUser.scoopDay,
                             onValueChange = {
@@ -115,16 +118,15 @@ fun SettingsScreen(
                             },
                             readOnly = true,
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                            modifier = Modifier
-                                .menuAnchor(PrimaryNotEditable)
-                                .fillMaxWidth()
-
-
+                            modifier =
+                                Modifier
+                                    .menuAnchor(PrimaryNotEditable)
+                                    .fillMaxWidth(),
                         )
 
                         ExposedDropdownMenu(
                             expanded = expanded,
-                            onDismissRequest = { expanded = false }
+                            onDismissRequest = { expanded = false },
                         ) {
                             options.forEach { option ->
                                 DropdownMenuItem(
@@ -132,49 +134,47 @@ fun SettingsScreen(
                                     onClick = {
                                         newUser = newUser.copy(scoopDay = option)
                                         expanded = false
-                                    }
+                                    },
                                 )
-
                             }
-
                         }
-
-
                     }
-
-
                 }
 
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .widthIn(max = 680.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .widthIn(max = 680.dp),
                         /** set max size */
                         shape = MaterialTheme.shapes.large,
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface
-                            /** white */
-                        ),
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                /** white */
+                            ),
                         /** Cards are raised by default with a shadow, so we remove it */
-                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                     ) {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
                         )
                         {
                             Text(
                                 text = "Current User",
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
                             )
                             OutlinedTextField(
                                 value = newUser.name,
@@ -188,30 +188,31 @@ fun SettingsScreen(
                                     Text("New name FN")
                                 },
                                 /** By default, capitalize the first letter of each word */
-                                keyboardOptions = KeyboardOptions(
-                                    capitalization = KeyboardCapitalization.Words
-                                ),
+                                keyboardOptions =
+                                    KeyboardOptions(
+                                        capitalization = KeyboardCapitalization.Words,
+                                    ),
                                 shape = MaterialTheme.shapes.medium,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = InputBackground,
-                                    unfocusedBorderColor = InputBackground,
-                                    focusedContainerColor = InputBackground,
-                                    unfocusedContainerColor = InputBackground,
-                                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                                    focusedPlaceholderColor = MutedText,
-                                    unfocusedPlaceholderColor = MutedText,
-                                    cursorColor = PrimaryPurple
-                                )
+                                colors =
+                                    OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = InputBackground,
+                                        unfocusedBorderColor = InputBackground,
+                                        focusedContainerColor = InputBackground,
+                                        unfocusedContainerColor = InputBackground,
+                                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                        focusedPlaceholderColor = MutedText,
+                                        unfocusedPlaceholderColor = MutedText,
+                                        cursorColor = PrimaryPurple,
+                                    ),
                             )
                             Button(
                                 onClick = { onSaveClicked(newUser) },
                                 modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryPurple)
+                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryPurple),
                             ) {
                                 Text("Save")
                             }
-
                         }
                     }
                 }

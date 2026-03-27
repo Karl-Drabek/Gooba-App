@@ -9,7 +9,6 @@ import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-
 /**
  * formatTime puts the Instant into the time format:
  * hour:minute:AM/PM
@@ -21,7 +20,7 @@ fun timeToText(instant: Instant): String {
 
     val minutePadded = time.minute.toString().padStart(2, '0')
 
-    return "${time.hour}:${minutePadded} ${time.amPm}"
+    return "${time.hour}:$minutePadded ${time.amPm}"
 }
 
 /**
@@ -37,16 +36,17 @@ fun timeToValues(instant: Instant): TimeFormat {
     val minute = local.minute
 
     val amPm = if (hour24 < 12) "AM" else "PM"
-    val hour12 = when {
-        hour24 == 0 -> 12
-        hour24 > 12 -> hour24 - 12
-        else -> hour24
-    }
+    val hour12 =
+        when {
+            hour24 == 0 -> 12
+            hour24 > 12 -> hour24 - 12
+            else -> hour24
+        }
     return TimeFormat(hour12, minute, amPm)
 }
 
-
 // TODO make it so that the time is for the correct day
+
 /**
  * Takes the time format and recreates the instant:
  *
@@ -55,11 +55,12 @@ fun timeToValues(instant: Instant): TimeFormat {
 fun valuesToTime(time: TimeFormat): Instant {
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
-    val hour24 = when (time.amPm) {
-        "AM" if time.hour == 12 -> 0
-        "PM" if time.hour != 12 -> time.hour + 12
-        else -> time.hour
-    }
+    val hour24 =
+        when (time.amPm) {
+            "AM" if time.hour == 12 -> 0
+            "PM" if time.hour != 12 -> time.hour + 12
+            else -> time.hour
+        }
 
     return LocalDateTime(
         year = today.year,
@@ -68,7 +69,6 @@ fun valuesToTime(time: TimeFormat): Instant {
         hour = hour24,
         minute = time.minute,
         second = 0,
-        nanosecond = 0
+        nanosecond = 0,
     ).toInstant(TimeZone.currentSystemDefault())
 }
-

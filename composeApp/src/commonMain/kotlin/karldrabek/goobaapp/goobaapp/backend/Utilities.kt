@@ -1,22 +1,25 @@
 package karldrabek.goobaapp.goobaapp.backend
 
-import karldrabek.goobaapp.goobaapp.utils.GoobaTask
 import karldrabek.goobaapp.goobaapp.utils.TaskCompletionDay
-import karldrabek.goobaapp.goobaapp.backend.Task
-import karldrabek.goobaapp.goobaapp.backend.*
+import karldrabek.goobaapp.goobaapp.utils.TaskType
 import kotlinx.datetime.*
-import kotlin.time.Instant
 import kotlin.time.Clock
+import kotlin.time.Instant
 
 val taskManager = TaskRemoteManager
 val userManager = UserRemoteManager
 
-fun getDateAndTimeAsString(instant: Instant = Clock.System.now()): Pair<String, String> {
+data class DateTime(
+    val date: String,
+    val time: String,
+)
+
+fun getDateAndTimeAsString(instant: Instant = Clock.System.now()): DateTime {
     val systemTimeZone = TimeZone.currentSystemDefault()
     val dateAndTime = instant.toLocalDateTime(systemTimeZone)
     val date = "${dateAndTime.day} : ${dateAndTime.month} : ${dateAndTime.year}"
     val time = "${dateAndTime.hour} : ${dateAndTime.minute} : ${dateAndTime.second}"
-    return Pair(date, time)
+    return DateTime(date, time)
 }
 
 /**
@@ -25,16 +28,19 @@ fun getDateAndTimeAsString(instant: Instant = Clock.System.now()): Pair<String, 
  * @param user User that completed the task
  * @param task The completed task
  */
-suspend fun feed(user : User, task: GoobaTask) {
-
+suspend fun feed(
+    user: User,
+    task: TaskType,
+) {
     // Crate Completed Task
     val dateAndTime = getDateAndTimeAsString()
-    val dbTask = Task(
-        type=task.toString(),
-        userID=user.id,
-        time=dateAndTime.second,
-        date=dateAndTime.first
-    )
+    val dbTask =
+        Task(
+            type = task.toString(),
+            userID = user.id,
+            time = dateAndTime.date,
+            date = dateAndTime.time,
+        )
 
     // Send to DB
     taskManager.addTask(dbTask)
@@ -42,7 +48,6 @@ suspend fun feed(user : User, task: GoobaTask) {
 
 // TODO
 fun scoop(user: User) {
-
     // Check the day
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
     if (user.scoopDay.uppercase() != today.dayOfWeek.toString().uppercase()) {
@@ -57,15 +62,19 @@ fun scoop(user: User) {
  * @param userID the ID associated with the new user who will be marked as having completed the task
  * @param date the date to be changed
  */
-suspend fun editTask(type: String, userID: Int, date: String){
-
+suspend fun editTask(
+    type: String,
+    userID: Int,
+    date: String,
+) {
     val dateAndTime = getDateAndTimeAsString()
-    val bufferTask = Task(
-        type=type,
-        userID=userID,
-        date=date,
-        time=dateAndTime.second,
-    )
+    val bufferTask =
+        Task(
+            type = type,
+            userID = userID,
+            date = date,
+            time = dateAndTime.time,
+        )
 
     // Update the task on the DB
     taskManager.updateTask(bufferTask)
@@ -77,8 +86,10 @@ suspend fun editTask(type: String, userID: Int, date: String){
  * @param type the taskID associated with the task which will be deleted
  * @param date the date of task to be deleted
  */
-suspend fun deleteTask(type: String, date: String) = taskManager.removeTask(type, date)
-
+suspend fun deleteTask(
+    type: String,
+    date: String,
+) = taskManager.removeTask(type, date)
 
 /**
  * Gets a TaskCompletionDay with the three events in a day, possibly null
@@ -87,7 +98,7 @@ suspend fun deleteTask(type: String, date: String) = taskManager.removeTask(type
  * @return a TaskCompletionDay with the events of the day. They may be null.
  */
 fun getTasksDay(time: Instant): TaskCompletionDay {
-    //TODO
+    // TODO
     // Also consider other more efficient ways to get the tasks.
     // it might be faster to just pull everything and then sort it on
     // the clients side, or to offer different functions for how much\

@@ -13,9 +13,19 @@ import karldrabek.goobaapp.goobaapp.ui.theme.InputBackground
 import karldrabek.goobaapp.goobaapp.ui.theme.MutedText
 import karldrabek.goobaapp.goobaapp.ui.theme.PrimaryPurple
 
+// TODO this should be used the the settings menu I think
 
+/**
+ * Name Entry box allows someone to enter their name. used in enter name screen and no longer used for editing tasks
+ *
+ * @param name the default name for the box
+ * @param onValueChanged call when the name value is changed. you should remember name locally and change it here so that when you call this again it will be updated
+ */
 @Composable
-fun NameEntryBox(name: String, onValueChanged: (String) -> Unit)  {
+fun NameEntryBox(
+    name: String,
+    onValueChanged: (String) -> Unit,
+) {
     OutlinedTextField(
         value = name,
         onValueChange = onValueChanged,
@@ -25,20 +35,22 @@ fun NameEntryBox(name: String, onValueChanged: (String) -> Unit)  {
             Text("Your name")
         },
         /** By default, capitalize the first letter of each word */
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Words
-        ),
+        keyboardOptions =
+            KeyboardOptions(
+                capitalization = KeyboardCapitalization.Words,
+            ),
         shape = MaterialTheme.shapes.medium,
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = InputBackground,
-            unfocusedBorderColor = InputBackground,
-            focusedContainerColor = InputBackground,
-            unfocusedContainerColor = InputBackground,
-            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-            focusedPlaceholderColor = MutedText,
-            unfocusedPlaceholderColor = MutedText,
-            cursorColor = PrimaryPurple
-        )
+        colors =
+            OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = InputBackground,
+                unfocusedBorderColor = InputBackground,
+                focusedContainerColor = InputBackground,
+                unfocusedContainerColor = InputBackground,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedPlaceholderColor = MutedText,
+                unfocusedPlaceholderColor = MutedText,
+                cursorColor = PrimaryPurple,
+            ),
     )
 }

@@ -1,0 +1,7 @@
+[*.{kt,kts}]
+ktlint_experimental = enabled
+# Enforce KDoc for all public declarations
+ktlint_experimental_kdoc = enabled
+# Optional: Enforce specific KDoc structure
+ktlint_experimental_kdoc-wrapping = enabled
+ktlint_experimental_kdoc-comments = enabled

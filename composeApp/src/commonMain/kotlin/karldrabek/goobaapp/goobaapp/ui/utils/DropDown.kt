@@ -8,9 +8,9 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 
@@ -33,7 +33,7 @@ fun <T> DropDown(
     selected: T,
     onSelected: (T) -> Unit,
     modifier: Modifier = Modifier,
-    formatter: (T) -> String = { it.toString() }
+    formatter: (T) -> String = { it.toString() },
 ) {
     /** save whether we are expanded.
      * note that whoever calls this functions should save the state of selected */
@@ -42,7 +42,7 @@ fun <T> DropDown(
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
-        modifier = modifier
+        modifier = modifier,
     ) {
         OutlinedTextField(
             value = formatter(selected),
@@ -52,14 +52,15 @@ fun <T> DropDown(
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             },
-            modifier = Modifier
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                .fillMaxWidth()
+            modifier =
+                Modifier
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                    .fillMaxWidth(),
         )
 
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
@@ -67,7 +68,7 @@ fun <T> DropDown(
                     onClick = {
                         onSelected(option)
                         expanded = false
-                    }
+                    },
                 )
             }
         }

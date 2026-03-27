@@ -5,6 +5,6 @@ import androidx.compose.runtime.Composable
 
 @Composable
 fun ErrorScreen(errorMessage: String) {
-    //TODO, make look pretty
+    // TODO, make look pretty
     Text(text = errorMessage)
 }

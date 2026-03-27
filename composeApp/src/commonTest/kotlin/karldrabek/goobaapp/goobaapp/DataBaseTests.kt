@@ -3,7 +3,6 @@ package karldrabek.goobaapp.goobaapp
 import karldrabek.goobaapp.goobaapp.backend.*
 import kotlin.test.Test
 import kotlin.test.*
-import kotlinx.datetime.*
 import kotlinx.coroutines.test.runTest
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
