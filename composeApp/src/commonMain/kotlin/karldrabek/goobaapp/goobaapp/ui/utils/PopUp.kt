@@ -21,12 +21,12 @@ import androidx.compose.ui.unit.dp
  * Creates a pop-up in the center of the screen which blocks the rest of the screen
  * with an alpha effect
  *
- * @property content the content to be displayed.
+ * @param content the content to be displayed.
  */
 @Composable
 fun PopUp(content: @Composable () -> Unit) {
     Box(
-        /** modifier fills the whole screen with an alpha so everything else appears darker */
+        // modifier fills the whole screen with an alpha so everything else appears darker
         Modifier
             .fillMaxSize()
             .background(Color.Black.copy(alpha = 0.4f))
@@ -35,11 +35,11 @@ fun PopUp(content: @Composable () -> Unit) {
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() },
             ) {
-                /** do nothing to eat up clicks on other buttons behind alpha */
+                // do nothing to eat up clicks on other buttons behind alpha
             },
         contentAlignment = Alignment.Center,
     ) {
-        /** border for popup */
+        // border for popup
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.large,
@@ -47,10 +47,10 @@ fun PopUp(content: @Composable () -> Unit) {
                 CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                 ),
-            /** Display flat with canvas */
+            // Display flat with canvas
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         ) {
-            /** pads elements away from edge of the card*/
+            // pads elements away from edge of the card
             Box(modifier = Modifier.padding(16.dp)) {
                 content()
             }

@@ -24,7 +24,7 @@ actual fun pickTime(
         UIDatePicker().apply {
             datePickerMode = UIDatePickerMode.UIDatePickerModeTime
             preferredDatePickerStyle =
-                UIDatePickerStyle.UIDatePickerStyleWheels /** Direct wheel-style picker */
+                UIDatePickerStyle.UIDatePickerStyleWheels // Direct wheel-style picker
             translatesAutoresizingMaskIntoConstraints = false
         }
 
@@ -50,7 +50,7 @@ actual fun pickTime(
             constant = 0.0,
         ).active = true
 
-    /** Add a "Done" button */
+    // Add a "Done" button
     alertController.addAction(
         UIAlertAction.actionWithTitle(
             title = "Done",
@@ -65,7 +65,7 @@ actual fun pickTime(
         },
     )
 
-    /** Present the alert */
+    // Present the alert
     UIApplication.sharedApplication.keyWindow?.rootViewController?.presentViewController(
         alertController,
         animated = true,

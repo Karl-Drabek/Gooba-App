@@ -22,6 +22,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
+        initKoin()
+
         /** setup local storage for android */
         val sessionStorage =
             AndroidSessionStorage(

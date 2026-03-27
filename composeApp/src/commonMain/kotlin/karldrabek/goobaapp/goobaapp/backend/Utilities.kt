@@ -2,25 +2,16 @@ package karldrabek.goobaapp.goobaapp.backend
 
 import karldrabek.goobaapp.goobaapp.utils.TaskCompletionDay
 import karldrabek.goobaapp.goobaapp.utils.TaskType
-import kotlinx.datetime.*
+import karldrabek.goobaapp.goobaapp.utils.getDateAndTimeAsString
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 import kotlin.time.Instant
 
+// TODO delete this file
+
 val taskManager = TaskRemoteManager
 val userManager = UserRemoteManager
-
-data class DateTime(
-    val date: String,
-    val time: String,
-)
-
-fun getDateAndTimeAsString(instant: Instant = Clock.System.now()): DateTime {
-    val systemTimeZone = TimeZone.currentSystemDefault()
-    val dateAndTime = instant.toLocalDateTime(systemTimeZone)
-    val date = "${dateAndTime.day} : ${dateAndTime.month} : ${dateAndTime.year}"
-    val time = "${dateAndTime.hour} : ${dateAndTime.minute} : ${dateAndTime.second}"
-    return DateTime(date, time)
-}
 
 /**
  *

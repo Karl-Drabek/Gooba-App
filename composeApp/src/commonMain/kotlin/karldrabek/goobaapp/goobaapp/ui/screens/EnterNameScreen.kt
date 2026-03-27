@@ -19,7 +19,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,102 +31,112 @@ import karldrabek.goobaapp.goobaapp.backend.User
 import karldrabek.goobaapp.goobaapp.ui.theme.ButtonDisabled
 import karldrabek.goobaapp.goobaapp.ui.theme.MutedText
 import karldrabek.goobaapp.goobaapp.ui.theme.PrimaryPurple
-
 import karldrabek.goobaapp.goobaapp.ui.utils.NameEntryBox
 
 /**
  * EnterNameScreen handles the name entry for the first time that
  * the user enters the application
  *
- *  @property onSave called to save a particular username for the user.
+ *  @param onSave called to save a particular username for the user.
+ *  @param validName used to check if a name already exists in the database. This doesn't need to handle empty names or trimming.
  */
 @Composable
 fun EnterNameScreen(
     onSave: (User) -> Unit,
-    validName: (String) -> Boolean
+    validName: (String) -> Boolean,
 ) {
-    /** Save whether the user entered and existing name, and
-      * the current name in the input box */
+    // Save whether the user entered and existing name, and
+    // the current name in the input box
     var name by remember { mutableStateOf("") }
 
-    /** background */
+    // background
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        /** canvas element containing all the enter name info */
+        // canvas element containing all the enter name info
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .widthIn(max = 680.dp), /** set max size */
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .widthIn(max = 680.dp),
+            // set max size
             shape = MaterialTheme.shapes.large,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface /** white */
-            ),
-            /** Cards are raised by default with a shadow, so we remove it */
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface, // white
+                ),
+            // Cards are raised by default with a shadow, so we remove it
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         ) {
             Column(
                 modifier = Modifier.padding(horizontal = 28.dp, vertical = 36.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(18.dp)
+                verticalArrangement = Arrangement.spacedBy(18.dp),
             ) {
-                /** purple circle behind pet icon */
+                // purple circle behind pet icon
                 Box(
-                    modifier = Modifier
-                        .size(96.dp)
-                        .background(
-                            color = PrimaryPurple.copy(alpha = 0.12f),
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(96.dp)
+                            .background(
+                                color = PrimaryPurple.copy(alpha = 0.12f),
+                                shape = CircleShape,
+                            ),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    /** paw icon, make sure to refresh Gradle */
+                    // paw icon, make sure to refresh Gradle
                     Icon(
                         imageVector = Icons.Outlined.Pets,
                         contentDescription = null,
                         tint = PrimaryPurple,
-                        modifier = Modifier.size(42.dp)
+                        modifier = Modifier.size(42.dp),
                     )
                 }
 
+                // Welcome text
                 Text(
                     text = "Welcome to Gooba Tracker",
                     style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
+                // Name entry prompt
                 Text(
                     text = "Please enter your name to continue",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MutedText
+                    color = MutedText,
                 )
 
-                NameEntryBox(name){
+                // Place for user to enter their name
+                NameEntryBox(name) {
                     name = it
                 }
 
                 Button(
                     onClick = {
-                        if(validName(name))
-                        {
+                        if (validName(name)) {
                             onSave(User(name))
+                        } else {
+                            // TODO handle if not valid
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ButtonDisabled,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    enabled = name.trim().isNotEmpty()
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = ButtonDisabled,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
+                    enabled = name.trim().isNotEmpty(),
                 ) {
                     Text(
-                        text = if(validName(name)) "Continue" else "Name already exists",
+                        text = if (validName(name)) "Continue" else "Name already exists",
                         modifier = Modifier.padding(vertical = 6.dp),
-                        style = MaterialTheme.typography.labelLarge
+                        style = MaterialTheme.typography.labelLarge,
                     )
                 }
             }

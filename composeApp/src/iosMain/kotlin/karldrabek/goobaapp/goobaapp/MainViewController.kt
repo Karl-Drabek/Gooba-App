@@ -11,6 +11,7 @@ import karldrabek.goobaapp.goobaapp.state.AppViewModel
  */
 fun MainViewController() =
     ComposeUIViewController {
+        initKoin()
         val sessionStorage = IosSessionStorage()
         val viewModel = AppViewModel(sessionStorage = sessionStorage)
 

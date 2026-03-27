@@ -7,7 +7,7 @@ import karldrabek.goobaapp.goobaapp.ui.localStorage.SessionStorage
 /**
  * Android specific implementation of the SessionStorage interface
  *
- * @property SharedPreferences the shared preferences for the app.
+ * @property sharedPreferences the shared preferences for the app.
  */
 class AndroidSessionStorage(
     private val sharedPreferences: SharedPreferences,

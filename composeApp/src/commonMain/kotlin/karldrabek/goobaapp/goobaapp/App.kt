@@ -3,7 +3,8 @@ package karldrabek.goobaapp.goobaapp
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import karldrabek.goobaapp.goobaapp.backend.networkModule
 import karldrabek.goobaapp.goobaapp.state.AppScreen
@@ -29,19 +30,16 @@ fun App(
     viewModel: AppViewModel,
     context: Any?,
 ) {
-    /** Module Setup */
-    initKoin()
-
-    /** Launch coroutines to get all the user and task data when app is first launched */
+    // Launch coroutines to get all the user and task data when app is first launched
     LaunchedEffect(Unit) {
         viewModel.loadInitialData()
     }
 
-    /** Stores const state data */
+    // Stores const state data
     val state = viewModel.uiState
 
     GoobaTheme {
-        /** This box is the background for the app */
+        // This box is the background for the app
         Box(
             modifier =
                 Modifier
@@ -49,17 +47,20 @@ fun App(
                     .background(androidx.compose.material3.MaterialTheme.colorScheme.background),
         ) {
             when (state) {
-                /** Loading Screen */
+                // Loading Screen
                 AppUiState.Loading -> {
                     LoadingScreen()
                 }
 
-                /** Error Screen */
+                // Error Screen
                 is AppUiState.Error -> {
-                    ErrorScreen(state.message)
+                    ErrorScreen(
+                        errorMessage = state.message,
+                        onRetry = viewModel::loadInitialData,
+                    )
                 }
 
-                /** Name Entry Screen */
+                // Name Entry Screen
                 is AppUiState.NameEntry -> {
                     EnterNameScreen(
                         validName = { viewModel.validName(it) },
@@ -69,10 +70,10 @@ fun App(
                     )
                 }
 
-                /** User is logged-in and we have pulled data from db */
+                // User is logged-in and we have pulled data from db
                 is AppUiState.Ready -> {
                     when (state.currentScreen) {
-                        /** Main Menu Screen */
+                        // Main Menu Screen
                         AppScreen.MAIN_MENU -> {
                             MainScreen(
                                 state.currentUser,
@@ -85,19 +86,20 @@ fun App(
                             )
                         }
 
-                        /** Settings Screen */
+                        // Settings Screen
                         AppScreen.SETTINGS -> {
                             SettingsScreen(
                                 state.currentUser,
                                 onExit = { viewModel.goTo(AppScreen.MAIN_MENU) },
                                 onLogout = { viewModel.logout() },
+                                onDeleteUser = { viewModel.deleteCurrentUser() },
                                 onSaveClicked = {
                                     viewModel.updateUser(it)
                                 },
                             )
                         }
 
-                        /** History Screen */
+                        // History Screen
                         AppScreen.HISTORY -> {
                             HistoryScreen(state.currentUser) { viewModel.goTo(AppScreen.MAIN_MENU) }
                         }
@@ -105,14 +107,5 @@ fun App(
                 }
             }
         }
-    }
-}
-
-/**
- * starts koin
- */
-fun initKoin() {
-    startKoin {
-        modules(networkModule)
     }
 }

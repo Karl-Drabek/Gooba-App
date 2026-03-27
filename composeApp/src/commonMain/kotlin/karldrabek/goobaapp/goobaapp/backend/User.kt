@@ -20,7 +20,8 @@ import kotlin.getValue
  * User stores all data for the user that is stored in the DB.
  *
  * @property name the name of the User.
- * @property scoopDay the DayofWeek which the user is assigned to scoop the poop.
+ * @property scoopDay the day of the week which the user is assigned to scoop the poop.
+ * @property id the userID to uniquely identify the user
  * @constructor Creates a user with a name who is assigned to no day to scoop poop.
  */
 @Serializable
@@ -32,10 +33,11 @@ data class User(
     override fun toString(): String = name
 }
 
+/** Don't instantiate. can be used to call various server functions */
 object UserRemoteManager : KoinComponent {
-    /** Adds a User to the database if it does not exist, always returns the clients user
-     * @param user user
-     * @return App user
+    /** Adds a User to the database if it does not exist
+     * @param user the user which you wish to register with the database.
+     * @return the same user which was passed in if all was successful. if the user already exists or another error occurs this returns null.
      */
     suspend fun registerUser(user: User): User? {
         val client: HttpClient by inject()
@@ -46,7 +48,7 @@ object UserRemoteManager : KoinComponent {
 
         // Return the added user
         val response: HttpResponse =
-            client.post(postUsersUrl) {
+            client.post(POST_USERS_URL) {
                 contentType(ContentType.Application.Json)
                 setBody(user)
             }
@@ -61,13 +63,13 @@ object UserRemoteManager : KoinComponent {
 
     /** Updates a given user on the server
      * @param user new user credentials, id must remain the same
-     * @return new user information
+     * @return new user information if it was successful, otherwise null
      */
     suspend fun updateUser(user: User): User? {
         val client: HttpClient by inject()
 
         val response: HttpResponse =
-            client.put(putUsersUrl) {
+            client.put(PUT_USERS_URL) {
                 contentType(ContentType.Application.Json)
                 setBody(user)
             }
@@ -80,7 +82,12 @@ object UserRemoteManager : KoinComponent {
         return null
     }
 
-    /** Searches for a user on the DB */
+    /**
+     * Searches for a user on the DB
+     *
+     * @param id the id of the user which you want to search for
+     * @return the user if it exists, or null if it does not or there was an error
+     */
     suspend fun searchUserById(id: Int): User? {
         val client: HttpClient by inject()
         val response: HttpResponse = client.get(searchUserByIdUrl(id))
@@ -93,6 +100,12 @@ object UserRemoteManager : KoinComponent {
         }
     }
 
+    /**
+     * Searches the database for a list of users which have a particular name
+     *
+     * @param name the name of the users which we are searching for
+     * @return the list of all users in the database with that name. The list is empty if no such users exist. the result is null if there was an error in the query.
+     */
     suspend fun searchUsersByName(name: String): List<User>? {
         val client: HttpClient by inject()
         val response: HttpResponse = client.get(searchUserByNameUrl(name))
@@ -112,20 +125,28 @@ object UserRemoteManager : KoinComponent {
      */
     suspend fun clearAllUsers() {
         val client: HttpClient by inject()
-        client.get(clearUsersUrl)
+        client.get(CLEAR_USERS_URL)
     }
 
-    /** Returns all users that exist on the database */
+    /** Returns all users that exist on the database
+     *
+     * @return the list of all users in the database. The list is empty if no such users exist. the result is null if there was an error in the query.
+     */
     suspend fun getAllUsers(): List<User>? {
         val client: HttpClient by inject()
-        val users: List<User> = client.get(getUsersUrl).body()
+        val users: List<User> = client.get(GET_USERS_URL).body()
 
         return users.ifEmpty {
             null
         }
     }
 
-    /** Returns true if user is successfully deleted */
+    /**
+     * Deletes the user from the database
+     *
+     * @param id the id of the user which is to be deleted
+     * @return true if the user was successfully deleted, otherwise false
+     */
     suspend fun deleteUser(id: Int): Boolean {
         val client: HttpClient by inject()
         val response: HttpResponse = client.delete(deleteUsersUrl(id))

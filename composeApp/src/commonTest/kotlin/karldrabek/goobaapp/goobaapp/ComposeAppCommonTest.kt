@@ -1,14 +1,12 @@
 package karldrabek.goobaapp.goobaapp
 
-// Imports
-import karldrabek.goobaapp.goobaapp.backend.*
-import kotlinx.datetime.*
-import org.koin.core.component.KoinComponent
+import karldrabek.goobaapp.goobaapp.backend.User
+import kotlinx.datetime.DayOfWeek
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class randomUser {
-    val names = listOf<String>("Ashton", "Maddy", "Zak", "Luke", "Kearnan", "Karl")
+class RandomUser {
+    val names = listOf("Ashton", "Maddy", "Zak", "Luke", "Kearnan-Super-Gay-Butt-Fucker", "Karl")
 
     fun generateUser(): User =
         User(

@@ -13,8 +13,6 @@ import karldrabek.goobaapp.goobaapp.ui.theme.InputBackground
 import karldrabek.goobaapp.goobaapp.ui.theme.MutedText
 import karldrabek.goobaapp.goobaapp.ui.theme.PrimaryPurple
 
-// TODO this should be used the the settings menu I think
-
 /**
  * Name Entry box allows someone to enter their name. used in enter name screen and no longer used for editing tasks
  *
@@ -30,11 +28,11 @@ fun NameEntryBox(
         value = name,
         onValueChange = onValueChanged,
         modifier = Modifier.fillMaxWidth(),
-        singleLine = true, /** force one line even on enter */
+        singleLine = true, // force one line even on enter
         placeholder = {
             Text("Your name")
         },
-        /** By default, capitalize the first letter of each word */
+        // By default, capitalize the first letter of each word
         keyboardOptions =
             KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,

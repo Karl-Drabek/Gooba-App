@@ -8,6 +8,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import karldrabek.goobaapp.goobaapp.utils.TimeFormat
 
+/**
+ * Creates a set of three dropdowns to represent the time which
+ * are vertically arranged. make sure to save hour, minute and amPm
+ * because they will not be saved in this function.
+ *
+ * @param hour value to be displayed for hour [1-12]
+ * @param minute value to be displayed for minute [0-59]
+ * @param amPm "AM" or "PM
+ * @param onTimeChange when the user changed one of these fields this is called with the new format
+ */
 @Composable
 fun TimeDropDown(
     hour: Int,
@@ -19,7 +29,7 @@ fun TimeDropDown(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        /** Hour dropdown */
+        // Hour dropdown
         DropDown(
             label = "Hour",
             options = (1..12).toList(),
@@ -28,7 +38,7 @@ fun TimeDropDown(
             modifier = Modifier.weight(1f),
         )
 
-        /** Minute dropdown*/
+        // Minute dropdown
         DropDown(
             label = "Min",
             options = (0..59).toList(),
@@ -38,7 +48,7 @@ fun TimeDropDown(
             formatter = { minute -> minute.toString().padStart(2, '0') },
         )
 
-        /** AM/PM dropdown */
+        // AM/PM dropdown
         DropDown(
             label = "AM/PM",
             options = listOf("AM", "PM"),
