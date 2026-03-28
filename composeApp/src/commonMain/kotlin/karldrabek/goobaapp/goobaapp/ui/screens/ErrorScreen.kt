@@ -48,9 +48,7 @@ fun ErrorScreen(
         Card(
             modifier =
                 Modifier
-                    .padding(24.dp)
-                    .widthIn(max = 420.dp)
-                    .fillMaxWidth(),
+                    .padding(24.dp),
             shape = RoundedCornerShape(24.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         ) {

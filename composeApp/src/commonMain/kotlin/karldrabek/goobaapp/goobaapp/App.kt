@@ -63,10 +63,12 @@ fun App(
                 // Name Entry Screen
                 is AppUiState.NameEntry -> {
                     EnterNameScreen(
-                        validName = { viewModel.validName(it) },
+                        validName = viewModel::validName,
+                        users = state.users,
                         onSave = {
                             viewModel.registerUser(it)
                         },
+                        selectUser = viewModel::selectUser,
                     )
                 }
 
@@ -90,6 +92,7 @@ fun App(
                         AppScreen.SETTINGS -> {
                             SettingsScreen(
                                 state.currentUser,
+                                state.users,
                                 onExit = { viewModel.goTo(AppScreen.MAIN_MENU) },
                                 onLogout = { viewModel.logout() },
                                 onDeleteUser = { viewModel.deleteCurrentUser() },

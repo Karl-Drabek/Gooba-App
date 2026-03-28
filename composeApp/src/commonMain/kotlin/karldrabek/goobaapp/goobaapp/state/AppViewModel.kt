@@ -283,6 +283,33 @@ class AppViewModel(
     }
 
     /**
+     * Selects a user to be logged in as without creating a new user in the database
+     * this should be used to log into an existing account.
+     *
+     * @param user the user that will be logged in as.
+     */
+    fun selectUser(user: User) {
+        sessionStorage.saveUserId(user.id)
+
+        val state = uiState
+        if (state is AppUiState.Ready) {
+            uiState =
+                state.copy(
+                    currentUser = user,
+                    currentScreen = AppScreen.MAIN_MENU,
+                )
+        } else if (state is AppUiState.NameEntry) {
+            uiState =
+                AppUiState.Ready(
+                    currentUser = user,
+                    currentScreen = AppScreen.MAIN_MENU,
+                    users = state.users,
+                    tasks = state.tasks,
+                )
+        }
+    }
+
+    /**
      * logs the user out of the local storage and returns them to the main screen.
      */
     fun logout() {
