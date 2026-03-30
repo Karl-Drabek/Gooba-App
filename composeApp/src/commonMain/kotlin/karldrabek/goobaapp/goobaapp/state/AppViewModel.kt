@@ -79,6 +79,9 @@ class AppViewModel(
                     }
                 }
             } catch (e: Exception) {
+                e.stackTraceToString().lineSequence().forEach { line ->
+                    println("STACK_FRAME: $line") // or log.debug(line)
+                }
                 uiState = AppUiState.Error("Error Loading Data: ${e.message}")
             }
         }

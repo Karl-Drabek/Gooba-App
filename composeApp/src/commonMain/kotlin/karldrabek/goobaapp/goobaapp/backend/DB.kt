@@ -13,7 +13,7 @@ import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 
 /** search URLS for database calls */
-const val SERVER_URL = "http://127.0.0.1:1738"
+const val SERVER_URL = "http://192.168.0.87:1738"
 const val GET_USERS_URL = "$SERVER_URL/users"
 
 fun deleteUsersUrl(id: Int) = "$GET_USERS_URL/${id.toString().encodeURLParameter()}"
