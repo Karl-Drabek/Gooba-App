@@ -1,6 +1,7 @@
 package karldrabek.goobaapp.goobaapp.utils
 
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.toInstant
@@ -8,12 +9,30 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.Instant
 
+/** Converts an instant to a date and time string
+ *
+ * @param instant Datetime instant
+ * @return Pair of a date and a time string
+ */
 fun getDateAndTimeAsString(instant: Instant = Clock.System.now()): DateTime {
     val systemTimeZone = TimeZone.currentSystemDefault()
     val dateAndTime = instant.toLocalDateTime(systemTimeZone)
-    val date = "${dateAndTime.day} : ${dateAndTime.month} : ${dateAndTime.year}"
-    val time = "${dateAndTime.hour} : ${dateAndTime.minute} : ${dateAndTime.second}"
+    val date = "${dateAndTime.day}-${dateAndTime.month}-${dateAndTime.year}"
+    val time = "${dateAndTime.hour}:${dateAndTime.minute}:${dateAndTime.second}"
     return DateTime(date, time)
+}
+
+/**
+ *
+ * @param date
+ * @param time
+ * @return instant from that date and time
+ */
+fun dateAndTimeStringToInstant(date : String, time : String): Instant {
+
+    val localDateTime = LocalDateTime.parse("${date}T${time}")
+    val timeZone = TimeZone.currentSystemDefault()
+    return localDateTime.toInstant(timeZone)
 }
 
 /**
