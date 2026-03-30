@@ -99,10 +99,7 @@ object TaskRemoteManager : KoinComponent {
      */
     suspend fun getAllTasks(): List<Task>? {
         val client: HttpClient by inject()
-        val tasks: List<Task> = client.get(GET_TASKS_URL).body()
-        return tasks.ifEmpty {
-            null
-        }
+        return client.get(GET_TASKS_URL).body()
     }
 
     /**
