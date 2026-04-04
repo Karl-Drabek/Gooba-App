@@ -104,7 +104,10 @@ fun App(
 
                         // History Screen
                         AppScreen.HISTORY -> {
-                            HistoryScreen(state.currentUser) { viewModel.goTo(AppScreen.MAIN_MENU) }
+                            HistoryScreen(
+                                state.currentUser,
+                                onExit = { viewModel.goTo(AppScreen.MAIN_MENU) }
+                            )
                         }
                     }
                 }

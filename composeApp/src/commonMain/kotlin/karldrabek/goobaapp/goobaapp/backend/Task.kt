@@ -97,12 +97,10 @@ object TaskRemoteManager : KoinComponent {
      *
      * @return List of tasks. If there are no tasks this will be an empty list. If there is an error this returns null.
      */
-    suspend fun getAllTasks(): List<Task>? {
+    suspend fun getAllTasks(): List<Task> {
         val client: HttpClient by inject()
         val tasks: List<Task> = client.get(GET_TASKS_URL).body()
-        return tasks.ifEmpty {
-            null
-        }
+        return tasks
     }
 
     /**

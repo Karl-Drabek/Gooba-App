@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Pets
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.Settings
@@ -101,7 +102,7 @@ fun MainScreen(
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         // header at the top
-        Header(userName = user.toString(), onOpenSettings = onOpenSettings)
+        Header(userName = user.toString(), onOpenSettings = onOpenSettings, onOpenHistory = onOpenHistory)
 
         // Add a card for feeding with buttons for morning and evening
         TaskSectionCard(
@@ -239,6 +240,7 @@ fun MainScreen(
 private fun Header(
     userName: String,
     onOpenSettings: () -> Unit,
+    onOpenHistory: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
         // layout three elements from right to left
@@ -270,14 +272,26 @@ private fun Header(
             // push last element to the far right
             Spacer(modifier = Modifier.weight(1f))
 
-            // far right is the settings button
-            // If there are errors, try refreshing Gradle
-            IconButton(onClick = onOpenSettings) {
-                Icon(
-                    imageVector = Icons.Outlined.Settings,
-                    contentDescription = "Settings",
-                )
+            Column(
+            ){
+                // far right is the settings button
+                // If there are errors, try refreshing Gradle
+                IconButton(onClick = onOpenSettings) {
+                    Icon(
+                        imageVector = Icons.Outlined.Settings,
+                        contentDescription = "Settings",
+                    )
+                }
+
+                // History Button
+                IconButton(onClick = onOpenHistory) {
+                    Icon(
+                        imageVector = Icons.Outlined.History,
+                        contentDescription = "History",
+                    )
+                }
             }
+
         }
 
         // Shows today's date
