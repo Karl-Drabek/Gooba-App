@@ -9,29 +9,49 @@ import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import karldrabek.goobaapp.goobaapp.backend.Task
 import karldrabek.goobaapp.goobaapp.backend.User
 import karldrabek.goobaapp.goobaapp.ui.theme.DarkText
+import karldrabek.goobaapp.goobaapp.ui.utils.PopUp
 import karldrabek.goobaapp.goobaapp.utils.EventCompletedData
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import kotlin.time.Instant
+import karldrabek.goobaapp.goobaapp.utils.*
+
+enum class PopUpState {
+    DAY,
+    WEEK,
+    MONTH
+}
+
+data class HistoryPopUpData(
+    var state: PopUpState? = null,
+    var date: String? = null
+)
 
 // TODO: LUKE
 @Composable
 fun HistoryScreen(
     user: User,
-    onExit: () -> Unit
+    searchTaskByDate: (String) -> Unit,
+    onExit: () -> Unit,
 ) {
 
     // Screen Background
@@ -131,11 +151,26 @@ fun HistoryScreen(
                         )
                     }
 
+                    var data by remember {mutableStateOf<HistoryPopUpData?>(null)}
+
                     Button(
-                        onClick = {
-                            // Implement Date selection logic
+                        onClick= {
+                            if(datePickerState.selectedDateMillis != null) {
+                                val millis = datePickerState.selectedDateMillis
+
+                                // Assert non null
+                                millis!!
+
+                                // Implement Date selection
+                                val date = Instant.fromEpochMilliseconds(millis)
+                                    .toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
+
+                                // Select the PopUp type, day, month, year
+                                data?.state = PopUpState.DAY
+                                data?.date = date
+                            }
                         },
-                        modifier = Modifier.weight(1f),
+
                         shape = MaterialTheme.shapes.medium,
                         colors =
                             ButtonDefaults.outlinedButtonColors(
@@ -143,18 +178,50 @@ fun HistoryScreen(
                             ),
                         border =
                             BorderStroke(
-                                1.dp,
+                                2.dp,
                                 MaterialTheme.colorScheme.outline,
                             )
                     ) {
+
                         Text(
-                            text = "Enter",
-                            modifier = Modifier.padding(vertical = 8.dp),
+                            text = "Confirm Selection",
+                            fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleLarge,
                         )
                     }
+
+//                    // Render the popup
+//                    data?.let {
+//                        HistoryPopUp(it, searchTaskByDate())
+//                    }
+
                 }
             }
         }
+    }
+}
+
+@Composable
+fun HistoryPopUp(
+    data: HistoryPopUpData,
+    searchTaskByDate: (String) -> List<Task>
+){
+
+    when(data.state){
+        PopUpState.DAY -> {
+
+            PopUp {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ){
+
+
+                }
+            }
+        }
+        PopUpState.WEEK -> {}
+        PopUpState.MONTH -> {}
+        else -> {}
     }
 }

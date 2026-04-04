@@ -12,8 +12,14 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 
+// Maddy Parents House
+const val LUKE_PUTER_IP =  "192.168.40.15"
+
+// Our House
+//const val LUKE_PUTER_IP = "192.168.0.87"
+
 /** search URLS for database calls */
-const val SERVER_URL = "http://192.168.0.87:1738"
+const val SERVER_URL = "http://$LUKE_PUTER_IP:1738"
 const val GET_USERS_URL = "$SERVER_URL/users"
 
 fun deleteUsersUrl(id: Int) = "$GET_USERS_URL/${id.toString().encodeURLParameter()}"

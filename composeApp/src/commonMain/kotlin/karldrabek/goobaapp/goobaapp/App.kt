@@ -72,6 +72,9 @@ fun App(
                     )
                 }
 
+                // Blank
+                is AppUiState.TaskSuccess -> {}
+
                 // User is logged-in and we have pulled data from db
                 is AppUiState.Ready -> {
                     when (state.currentScreen) {
@@ -106,7 +109,8 @@ fun App(
                         AppScreen.HISTORY -> {
                             HistoryScreen(
                                 state.currentUser,
-                                onExit = { viewModel.goTo(AppScreen.MAIN_MENU) }
+                                onExit = { viewModel.goTo(AppScreen.MAIN_MENU) },
+                                searchTaskByDate = { viewModel.searchTaskByDate(it) }
                             )
                         }
                     }

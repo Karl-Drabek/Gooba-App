@@ -337,7 +337,7 @@ private fun TaskSectionCard(
             modifier = Modifier.padding(28.dp),
             verticalArrangement = Arrangement.spacedBy(22.dp),
         ) {
-            // tittle text
+            // title text
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
