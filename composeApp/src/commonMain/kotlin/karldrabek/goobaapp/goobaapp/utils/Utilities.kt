@@ -1,8 +1,10 @@
 package karldrabek.goobaapp.goobaapp.utils
 
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
+import kotlinx.datetime.number
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
@@ -49,6 +51,49 @@ fun timeToText(instant: Instant): String {
     val minutePadded = time.minute.toString().padStart(2, '0')
 
     return "${time.hour}:$minutePadded ${time.amPm}"
+}
+
+/**
+ * textToTime puts the string formatted time into an instant on the current day:
+ * hour:minute:AM/PM
+ *
+ * @param text the string version to be converted in the form hour:minute:AM/PM
+ * @param timeZone the timezone that the current time will be adjusted for
+ */
+fun textToTime(
+    text: String,
+    timeZone: TimeZone = TimeZone.currentSystemDefault(),
+): Instant {
+    // Split "5:07 PM" → ["5:07", "PM"]
+    val (timePart, amPm) = text.split(" ")
+
+    // Split "5:07" → ["5", "07"]
+    val (hourStr, minuteStr) = timePart.split(":")
+
+    var hour = hourStr.toInt()
+    val minute = minuteStr.toInt()
+
+    // Convert to 24-hour format
+    if (amPm == "PM" && hour != 12) hour += 12
+    if (amPm == "AM" && hour == 12) hour = 0
+
+    // Use today's date
+    val today =
+        Clock.System
+            .now()
+            .toLocalDateTime(timeZone)
+            .date
+
+    val localDateTime =
+        LocalDateTime(
+            year = today.year,
+            monthNumber = today.month.number,
+            dayOfMonth = today.day,
+            hour = hour,
+            minute = minute,
+        )
+
+    return localDateTime.toInstant(timeZone)
 }
 
 /**

@@ -20,7 +20,7 @@ import org.koin.core.component.inject
 import kotlin.time.Instant
 
 // TODO : CRACK KEARNAN HELLA (HE NEVER GONNA SEE THIS FR)
-// consider it done
+// TODO : check the returns for errors
 
 /** Stores data for a DB task request
  * @param type Activity ex Feeding/Scooping

@@ -10,10 +10,17 @@ import karldrabek.goobaapp.goobaapp.backend.TaskRemoteManager
 import karldrabek.goobaapp.goobaapp.backend.User
 import karldrabek.goobaapp.goobaapp.backend.UserRemoteManager
 import karldrabek.goobaapp.goobaapp.ui.localStorage.SessionStorage
+import karldrabek.goobaapp.goobaapp.utils.EventCompletedData
+import karldrabek.goobaapp.goobaapp.utils.TaskCompletionDay
+import karldrabek.goobaapp.goobaapp.utils.TaskType
+import karldrabek.goobaapp.goobaapp.utils.getDateAndTimeAsString
+import karldrabek.goobaapp.goobaapp.utils.textToTime
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.collections.plus
+
+// TODO add specific screen requirements to parameters with appstate
 
 /**
  * Stores state for the app and handles function calls to the local storage and to the database
@@ -39,7 +46,12 @@ class AppViewModel(
                 coroutineScope {
                     // Call suspends
                     val usersDeferred = async { UserRemoteManager.getAllUsers() }
-                    val tasksDeferred = async { TaskRemoteManager.getAllTasks() }
+                    val tasksDeferred =
+                        async {
+                            TaskRemoteManager.getTasksByDate(
+                                getDateAndTimeAsString().date,
+                            )
+                        }
 
                     // Wait while both are running. this is non-blocking
                     // so ui should still be rendering right now
@@ -60,6 +72,52 @@ class AppViewModel(
                             sessionStorage.clearSavedUserId()
                         }
 
+                        // Populate TaskCompletionDay
+                        val morningTask = tasks.find { it.type == TaskType.MORNING_FOOD.toString() }
+                        val eveningTask = tasks.find { it.type == TaskType.EVENING_FOOD.toString() }
+                        val poopTask = tasks.find { it.type == TaskType.SCOOP_POOP.toString() }
+
+                        val morningUser = users.find { it.id == morningTask?.userID }
+                        val eveningUser = users.find { it.id == eveningTask?.userID }
+                        val poopUser = users.find { it.id == poopTask?.userID }
+
+                        val morningEventData =
+                            morningTask?.let { task ->
+                                val user =
+                                    morningUser ?: run {
+                                        uiState = AppUiState.Error("No user with userid ${task.userID}")
+                                        return@coroutineScope
+                                    }
+                                EventCompletedData(user, textToTime(task.time))
+                            }
+
+                        val eveningEventData =
+                            eveningTask?.let { task ->
+                                val user =
+                                    eveningUser ?: run {
+                                        uiState = AppUiState.Error("No user with userid ${task.userID}")
+                                        return@coroutineScope
+                                    }
+                                EventCompletedData(user, textToTime(task.time))
+                            }
+
+                        val poopEventData =
+                            poopTask?.let { task ->
+                                val user =
+                                    poopUser ?: run {
+                                        uiState = AppUiState.Error("No user with userid ${task.userID}")
+                                        return@coroutineScope
+                                    }
+                                EventCompletedData(user, textToTime(task.time))
+                            }
+
+                        val taskCompletionDay =
+                            TaskCompletionDay(
+                                morning = morningEventData,
+                                evening = eveningEventData,
+                                poop = poopEventData,
+                            )
+
                         uiState =
                             // If the user was found then we are logged in
                             if (savedUser != null) {
@@ -67,13 +125,13 @@ class AppViewModel(
                                     currentScreen = AppScreen.MAIN_MENU,
                                     currentUser = savedUser,
                                     users = users,
-                                    tasks = tasks,
+                                    tasks = taskCompletionDay,
                                 )
                                 // Otherwise we need to log in the user
                             } else {
                                 AppUiState.NameEntry(
                                     users = users,
-                                    tasks = tasks,
+                                    tasks = taskCompletionDay,
                                 )
                             }
                     }
@@ -187,20 +245,12 @@ class AppViewModel(
     fun updateTask(task: Task) {
         viewModelScope.launch {
             try {
-                val successful = TaskRemoteManager.updateTask(task)
-
                 val state = uiState
-
+                val successful = TaskRemoteManager.updateTask(task)
                 if (!successful) {
                     uiState = AppUiState.Error("Failed to update task")
                 } else if (state is AppUiState.Ready) {
-                    uiState =
-                        state.copy(
-                            tasks =
-                                state.tasks.map { oldTask ->
-                                    if (oldTask.date == task.date && oldTask.type == task.type) task else oldTask
-                                },
-                        )
+                    updateStateForTask(task, state)
                 }
             } catch (e: Exception) {
                 uiState = AppUiState.Error("Failed to update task: ${e.message}")
@@ -223,7 +273,14 @@ class AppViewModel(
                 if (!successful) {
                     uiState = AppUiState.Error("Failed to delete task")
                 } else if (state is AppUiState.Ready) {
-                    uiState = state.copy(tasks = state.tasks - task)
+                    val taskCompletionDay = state.tasks.deleteTaskCopy(task)
+
+                    if (taskCompletionDay == null) {
+                        uiState = AppUiState.Error("Failed to delete due to unknown task type: ${task.type}")
+                        return@launch
+                    }
+
+                    uiState = state.copy(tasks = taskCompletionDay)
                 }
             } catch (e: Exception) {
                 uiState = AppUiState.Error("Failed to delete task: ${e.message}")
@@ -248,12 +305,33 @@ class AppViewModel(
                 if (!successful) {
                     uiState = AppUiState.Error("Failed to add task")
                 } else if (state is AppUiState.Ready) {
-                    uiState = state.copy(tasks = state.tasks + task)
+                    updateStateForTask(task, state)
                 }
             } catch (e: Exception) {
                 uiState = AppUiState.Error("Failed to add task: ${e.message}")
             }
         }
+    }
+
+    private fun updateStateForTask(
+        task: Task,
+        state: AppUiState.Ready,
+    ) {
+        val user = state.users.find { it.id == task.userID }
+
+        if (user == null) {
+            uiState = AppUiState.Error("No user with userid ${task.userID}")
+            return
+        }
+
+        val taskCompletionDay = state.tasks.updateTaskCopy(task, user)
+
+        if (taskCompletionDay == null) {
+            uiState = AppUiState.Error("Failed to update due to unknown task type: ${task.type}")
+            return
+        }
+
+        uiState = state.copy(tasks = taskCompletionDay)
     }
 
     /**
