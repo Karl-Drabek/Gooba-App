@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -73,15 +74,23 @@ fun HistoryScreen(
     val menuWidth = 180f
 
     // Menu visibility
-    var showMenu by rememberSaveable { mutableStateOf(false) }
+    var showRangeMenu by rememberSaveable { mutableStateOf(false) }
     var selectedState by rememberSaveable { mutableStateOf(ScreenState.DAY) }
 
     // Start with Today's Date YYYY-MM-DD
     var selectedDate by rememberSaveable {
         mutableStateOf(
-            Clock.System.todayIn(timeZone = TimeZone.currentSystemDefault()).toString()
+            Clock.System.todayIn(timeZone = TimeZone.UTC).toString()
         )
     }
+
+    var showDateMenu by rememberSaveable { mutableStateOf(false) }
+
+    // Create a Date Picker State
+    val datePickerState = rememberDatePickerState()
+
+    // Create a format
+    val datePickerFormat = remember { DatePickerDefaults.dateFormatter() }
 
     // Screen Background
     Box(
@@ -141,14 +150,15 @@ fun HistoryScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
+
+                        /** View Standpoint */
                         Button(
                             modifier = Modifier.padding(8.dp),
-                            onClick = { showMenu = !showMenu },
+                            onClick = { showRangeMenu = !showRangeMenu },
                             border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface),
-                            shape = RoundedCornerShape(4.dp),
-
-                            ) {
+                            shape = RoundedCornerShape(4.dp)
+                        ) {
 
                             Text(
                                 text = selectedState.toString(),
@@ -159,125 +169,99 @@ fun HistoryScreen(
 
                         }
 
-                        if (showMenu) {
-                            DropdownMenu(
-                                expanded = showMenu,
-                                onDismissRequest = { showMenu = false },
-                                modifier = Modifier.width(menuWidth.dp)
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text(ScreenState.DAY.toString()) },
-                                    onClick = {
-                                        selectedState = ScreenState.DAY
-                                        showMenu = false
-                                    }
-                                )
+                        DropdownMenu(
+                            expanded = showRangeMenu,
+                            onDismissRequest = { showRangeMenu = false },
+                            modifier = Modifier.width(menuWidth.dp)
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(ScreenState.DAY.toString()) },
+                                onClick = {
+                                    selectedState = ScreenState.DAY
+                                    showRangeMenu = false
+                                }
+                            )
 
-                                DropdownMenuItem(
-                                    text = { Text(ScreenState.WEEK.toString()) },
-                                    onClick = {
-                                        selectedState = ScreenState.WEEK
-                                        showMenu = false
-                                    }
-                                )
+                            DropdownMenuItem(
+                                text = { Text(ScreenState.WEEK.toString()) },
+                                onClick = {
+                                    selectedState = ScreenState.WEEK
+                                    showRangeMenu = false
+                                }
+                            )
 
-                                DropdownMenuItem(
-                                    text = { Text(ScreenState.MONTH.toString()) },
-                                    onClick = {
-                                        selectedState = ScreenState.MONTH
-                                        showMenu = false
-                                    }
-                                )
-                            }
+                            DropdownMenuItem(
+                                text = { Text(ScreenState.MONTH.toString()) },
+                                onClick = {
+                                    selectedState = ScreenState.MONTH
+                                    showRangeMenu = false
+                                }
+                            )
                         }
 
                         Spacer(Modifier.weight(1f))
 
-                        // Implement the date picker popup here
+                        /** Date Button */
+                        Button(
+                            modifier = Modifier.padding(8.dp),
+                            onClick =  { showDateMenu = !showDateMenu },
+                            border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline),
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surface),
+                            shape = RoundedCornerShape(4.dp),
+                        ){
 
+                            Text(
+                                text = "Date: $selectedDate",
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold
+                            )
 
+                        }
                     }
 
                     HorizontalDivider(thickness = 2.dp)
-//
-//                    // Create a Date Picker State
-//                    val datePickerState = rememberDatePickerState()
-//
-//                    // Create a format
-//                    val datePickerFormat = remember { DatePickerDefaults.dateFormatter() }
-//
-//                    CompositionLocalProvider(
-//                    ) {
-//                        DatePicker(
-//                            state= datePickerState,
-//                            dateFormatter = datePickerFormat,
-//                            modifier = Modifier.fillMaxWidth().graphicsLayer(
-//                                scaleX = 0.9f,
-//                                scaleY = 0.9f,
-//                                transformOrigin = TransformOrigin(0f,0f),
-//                            ),
-//                            colors=DatePickerDefaults.colors(
-//                                containerColor = MaterialTheme.colorScheme.surface,
-//                                titleContentColor = DarkText,
-//                                headlineContentColor = DarkText,
-//                                weekdayContentColor = DarkText,
-//                                subheadContentColor = DarkText,
-//
-//                                // Calendar day text
-//                                dayContentColor = DarkText,
-//                                selectedDayContentColor = Color.White,
-//
-//                                // Selected day background
-//                                selectedDayContainerColor = MaterialTheme.colorScheme.primary,
-//
-//                                // Today highlight
-//                                todayContentColor = MaterialTheme.colorScheme.primary,
-//                                todayDateBorderColor = MaterialTheme.colorScheme.primary,
-//                            )
-//                        )
-//                    }
-//
-//                    var data by remember {mutableStateOf<HistoryPopUpData?>(null)}
-//
-//                    Button(
-//                        onClick= {
-//                            if(datePickerState.selectedDateMillis != null) {
-//                                val millis = datePickerState.selectedDateMillis
-//
-//                                // Assert non null
-//                                millis!!
-//
-//                                // Implement Date selection
-//                                val date = Instant.fromEpochMilliseconds(millis)
-//                                    .toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
-//
-//                                // Select the PopUp type, day, month, year
-//                                data?.state = PopUpState.DAY
-//                                data?.date = date
-//                            }
-//                        },
-//
-//                        shape = MaterialTheme.shapes.medium,
-//                        colors =
-//                            ButtonDefaults.outlinedButtonColors(
-//                                containerColor = MaterialTheme.colorScheme.surface,
-//                            ),
-//                        border =
-//                            BorderStroke(
-//                                2.dp,
-//                                MaterialTheme.colorScheme.outline,
-//                            )
-//                    ) {
-//
-//                        Text(
-//                            text = "Confirm Selection",
-//                            fontWeight = FontWeight.Bold,
-//                            style = MaterialTheme.typography.titleLarge,
-//                        )
-//                    }
-//
-//                    // Render the popup
-//                    data?.let { HistoryPopUp(it) }
+
+                    if (showDateMenu) {
+
+                        LaunchedEffect(datePickerState.selectedDateMillis) {
+                            datePickerState.selectedDateMillis?.let { millis ->
+
+                                val date = Instant.fromEpochMilliseconds(millis)
+                                    .toLocalDateTime(TimeZone.UTC)
+                                    .date
+                                    .toString()
+
+                                selectedDate = date
+                            }
+                        }
+
+                        DatePicker(
+                            state = datePickerState,
+                            dateFormatter = datePickerFormat,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .graphicsLayer(
+                                    scaleX = 0.9f,
+                                    scaleY = 0.9f,
+                                    transformOrigin = TransformOrigin(0f, 0f),
+                                ),
+                            colors = DatePickerDefaults.colors(
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                titleContentColor = DarkText,
+                                headlineContentColor = DarkText,
+                                weekdayContentColor = DarkText,
+                                subheadContentColor = DarkText,
+                                dayContentColor = DarkText,
+                                selectedDayContentColor = Color.White,
+                                selectedDayContainerColor = MaterialTheme.colorScheme.primary,
+                                todayContentColor = MaterialTheme.colorScheme.primary,
+                                todayDateBorderColor = MaterialTheme.colorScheme.primary,
+                            )
+                        )
+                    } else {
+                       // Calendar View Logic
+                    }
                 }
             }
         }
