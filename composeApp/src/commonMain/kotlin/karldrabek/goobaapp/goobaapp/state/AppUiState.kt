@@ -11,11 +11,6 @@ sealed class AppUiState {
     /** Loading screen - no data */
     data object Loading : AppUiState()
 
-    /** Tasks Retrival, Just holds a task list */
-    data class TaskSuccess(
-        val tasks: List<Task>
-    ) : AppUiState()
-
     /** error screen - just holds an error message */
     data class Error(
         val message: String,

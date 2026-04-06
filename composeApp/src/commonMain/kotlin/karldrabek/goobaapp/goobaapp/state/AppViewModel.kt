@@ -309,29 +309,6 @@ class AppViewModel(
         }
     }
 
-    /** Searches for Tasks from a given date
-     *
-     * @param date The day to query
-     */
-    fun searchTaskByDate(date: String){
-        viewModelScope.launch {
-            val state = uiState
-
-            try {
-                val tasks = TaskRemoteManager.getTasksByDate(date)
-
-                uiState = if(tasks != null){
-                    AppUiState.TaskSuccess(tasks)
-                } else{
-                    AppUiState.Error("Server Communication Error")
-                }
-
-            } catch (e: Exception) {
-                uiState = AppUiState.Error("Failed to Retrieve tasks ${e.message}")
-            }
-        }
-    }
-
     /**
      * logs the user out of the local storage and returns them to the main screen.
      */

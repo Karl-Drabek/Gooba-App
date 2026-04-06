@@ -12,11 +12,11 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 
-// Maddy Parents House
-const val LUKE_PUTER_IP =  "192.168.40.15"
+// Maddy Parents and Sisters House
+//const val LUKE_PUTER_IP =  "192.168.40.15"
 
 // Our House
-//const val LUKE_PUTER_IP = "192.168.0.87"
+const val LUKE_PUTER_IP = "192.168.0.87"
 
 /** search URLS for database calls */
 const val SERVER_URL = "http://$LUKE_PUTER_IP:1738"
