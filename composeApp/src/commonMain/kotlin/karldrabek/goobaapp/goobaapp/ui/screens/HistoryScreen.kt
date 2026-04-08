@@ -126,9 +126,12 @@ fun DayOfTasks(
         val sizePx = minOf(maxWidth, maxHeight)
 
         // Define sizes as a percentage of the container
-        val iconSize = sizePx * 0.4f
+        val iconSize = sizePx * 0.2f
         val fontSize = sizePx.value * 0.15f
         val headerFontSize = fontSize * 1.5f
+
+        // Spacing
+        val taskPadding = sizePx * 0.2f
 
         var cells : MutableList<CellConfig> = mutableListOf()
 
@@ -166,7 +169,10 @@ fun DayOfTasks(
             for (cell in cells) {
 
                 Column(
-
+                    modifier =
+                        Modifier.
+                            fillMaxWidth().
+                            padding(vertical = taskPadding),
                 ){
 
                     // Task Name and Icon
