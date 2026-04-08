@@ -48,6 +48,8 @@ import kotlinx.datetime.todayIn
 
 /** HISTORY CONFIG */
 
+val todaysDate = Clock.System.todayIn(timeZone = TimeZone.UTC).toString()
+
 data class CellConfig(
     val icon: ImageVector,
     val taskName: String,
@@ -115,7 +117,7 @@ fun DayOfTasks(
     showTimes: Boolean = true,
     showTaskNames: Boolean = true,
     tasks: List<Task>,
-    users: List<User>
+    users: List<User>,
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -158,6 +160,11 @@ fun DayOfTasks(
                     )
                 )
             }
+        }
+
+        // TODO: Add a number and hline at the top of a calendar cell
+        fun calendarViewHeader(){
+
         }
 
         Column(
@@ -255,7 +262,7 @@ fun HistoryScreen(
     // Start with Today's Date YYYY-MM-DD
     var selectedDate by rememberSaveable {
         mutableStateOf(
-            Clock.System.todayIn(timeZone = TimeZone.UTC).toString()
+            todaysDate
         )
     }
 
@@ -266,6 +273,12 @@ fun HistoryScreen(
 
     // Create a format
     val datePickerFormat = remember { DatePickerDefaults.dateFormatter() }
+
+    //TODO
+    @Composable
+    fun viewHeader() {
+
+    }
 
     // Screen Background
     Box(
@@ -465,10 +478,31 @@ fun HistoryScreen(
                            }
 
                            // Week view implementation
-                           ScreenState.WEEK -> {}
+                           ScreenState.WEEK -> {
+
+                           }
 
                            // Month view implementation
-                           ScreenState.MONTH -> {}
+                           ScreenState.MONTH -> {
+
+                               val (year, month, day) = selectedDate.split("-")
+
+                               val monthOfTasks = taskDateRange(
+                                   startDate = "$year-$month-01",
+                                   endDate = "$year-$month-31",
+                                   tasks = tasks
+                               )
+
+                               for(i in 1..31){
+
+                                   val dayOfTasks = monthOfTasks.filter {
+                                       it.date.endsWith("$i")
+                                   }
+
+
+                               }
+
+                           }
                        }
                     }
                 }
