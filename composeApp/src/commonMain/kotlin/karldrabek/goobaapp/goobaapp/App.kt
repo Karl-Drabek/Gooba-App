@@ -105,7 +105,7 @@ fun App(
                         // History Screen
                         AppScreen.HISTORY -> {
                             HistoryScreen(
-                                user = state.currentUser,
+                                users = state.users,
                                 onExit = { viewModel.goTo(AppScreen.MAIN_MENU) },
                                 tasks = state.tasks,
                             )

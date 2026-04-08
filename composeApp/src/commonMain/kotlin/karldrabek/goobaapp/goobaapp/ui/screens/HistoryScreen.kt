@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.ModeNight
+import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
@@ -22,10 +25,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import goobaapp.composeapp.generated.resources.Res
 import io.ktor.http.parameters
 import karldrabek.goobaapp.goobaapp.backend.Task
 import karldrabek.goobaapp.goobaapp.backend.User
@@ -40,19 +46,185 @@ import kotlin.time.Instant
 import karldrabek.goobaapp.goobaapp.utils.*
 import kotlinx.datetime.todayIn
 
+/** HISTORY CONFIG */
+
+data class CellConfig(
+    val icon: ImageVector,
+    val taskName: String,
+    val user: User? = null,
+    val time: String? = null
+)
+
+// Icons
+val morningIcon: ImageVector = Icons.Default.WbSunny
+val eveningIcon: ImageVector = Icons.Default.ModeNight
+val scoopIcon: ImageVector = Icons.Default.Pets
+
+// Text
+const val morningText: String = "Morning Food"
+const val eveningText: String = "Evening Food"
+const val scoopText: String = "Poop Scoop"
+
+// pair list, order matters, can be done with a map in the future
+val taskPairs = listOf(
+    Pair(morningIcon, morningText),
+    Pair(eveningIcon, eveningText),
+    Pair(scoopIcon, scoopText)
+)
+/** ==================================================== */
+
+//TODO Luke
+
 /** Returns a list of tasks from a range of tasks between two dates, range is inclusive on both ends
  *
  * @param startDate Date string to start at YYYY-MM-DD
  * @param endDate Date string to end at YYYY-MM-DD
  * @return List of tasks that fall within the range, empty if no tasks were found
  */
-fun dateRange(startDate: String, endDate: String, tasks: List<Task>): List<Task> {
+fun taskDateRange(
+    startDate: String,
+    endDate: String, tasks:
+    List<Task>
+): List<Task> {
+
     val start = LocalDate.parse(startDate)
     val end = LocalDate.parse(endDate)
 
     return tasks.filter {
         val taskDate = LocalDate.parse(it.date)
         taskDate in start..end
+    }
+
+}
+
+
+// TODO: Change from hard coded show to variable based on screen size
+/** Creates a calendar cell off of a list of tasks
+ *
+ * @param showIcons: Display icons
+ * @param showUsers: Display users
+ * @param showTimes: Display times
+ * @param showTaskNames: Display Task name
+ * @param tasks: Tasks to display !!! MUST BE FOR SINGULAR DAY
+ * @param users: Database users
+ */
+@Composable
+fun DayOfTasks(
+    showIcons: Boolean = true,
+    showUsers: Boolean = true,
+    showTimes: Boolean = true,
+    showTaskNames: Boolean = true,
+    tasks: List<Task>,
+    users: List<User>
+) {
+    BoxWithConstraints(
+        modifier = Modifier
+            .aspectRatio(1f) // Keep cells square
+            .padding(4.dp)
+    ) {
+        // Calculate a scale factor based on the smallest dimension
+        val sizePx = minOf(maxWidth, maxHeight)
+
+        // Define sizes as a percentage of the container
+        val iconSize = sizePx * 0.4f
+        val fontSize = sizePx.value * 0.15f
+        val headerFontSize = fontSize * 1.5f
+
+        var cells : MutableList<CellConfig> = mutableListOf()
+
+        val morningTask: Task? = tasks.singleOrNull { it.type == TaskType.MORNING_FOOD.toString() }
+        val eveningTask: Task? = tasks.singleOrNull { it.type == TaskType.EVENING_FOOD.toString() }
+        val scoopTask: Task? = tasks.singleOrNull { it.type == TaskType.SCOOP_POOP.toString() }
+
+        val orderedTasks: List<Task?> = listOf(
+            morningTask,
+            eveningTask,
+            scoopTask
+        )
+
+        for(i in 0 until orderedTasks.size) {
+            val task: Task? = orderedTasks[i]
+            val pair = taskPairs[i]
+            if(task != null) {
+                cells.add(
+                    CellConfig(
+                        icon=pair.first,
+                        taskName = pair.second,
+                        user = users.find { it.id == task.userID },
+                        time = task.time
+                    )
+                )
+            }
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+
+            for (cell in cells) {
+
+                Column(
+
+                ){
+
+                    // Task Name and Icon
+                    Row(
+                        modifier = Modifier.padding(2.dp),
+                    ) {
+
+                        // TODO: Change conditional
+                        if(showIcons){
+
+                            Icon(
+                                cell.icon,
+                                null,
+                                modifier = Modifier.size(iconSize)
+                            )
+
+                        }
+
+                        // TODO: Change conditional
+                        if(showTaskNames){
+
+                            Text(
+                                text = cell.taskName,
+                                color = DarkText,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = headerFontSize.sp
+                            )
+
+                        }
+                    }
+
+                    // User and time
+                    Row(
+                        modifier = Modifier.padding(2.dp),
+                    ){
+
+                        // TODO: Change Conditional
+                        if(showUsers){
+                            Text(
+                                text = "By ${cell.user}",
+                                color = DarkText,
+                                fontSize = fontSize.sp
+                            )
+                        }
+
+                        // TODO: Change Conditional
+                        if(showTimes) {
+                            Text(
+                                text = "At: ${cell.time}",
+                                color = DarkText,
+                                fontSize = fontSize.sp
+                            )
+                        }
+                    }
+                }
+
+            }
+        }
     }
 }
 
@@ -61,12 +233,9 @@ enum class ScreenState {
     WEEK,
     MONTH
 }
-
-
-// TODO: LUKE
 @Composable
 fun HistoryScreen(
-    user: User,
+    users: List<User>,
     tasks: List<Task>,
     onExit: () -> Unit,
 ) {
@@ -260,7 +429,41 @@ fun HistoryScreen(
                             )
                         )
                     } else {
-                       // Calendar View Logic
+                       when(selectedState) {
+
+                           // Day view implementation
+                           ScreenState.DAY -> {
+
+                               Column(
+                                   modifier = Modifier.fillMaxWidth(),
+                                   horizontalAlignment = Alignment.CenterHorizontally,
+                                   verticalArrangement = Arrangement.spacedBy(16.dp),
+                               ) {
+
+                                   Text(
+                                       "Day View",
+                                       color = DarkText,
+                                       style = MaterialTheme.typography.headlineMedium,
+                                       fontWeight = FontWeight.Bold
+                                   )
+
+                                   HorizontalDivider(thickness = 2.dp)
+
+                                   val taskList = taskDateRange(selectedDate, selectedDate, tasks)
+
+                                   DayOfTasks(
+                                       tasks = taskList,
+                                       users = users
+                                   )
+                               }
+                           }
+
+                           // Week view implementation
+                           ScreenState.WEEK -> {}
+
+                           // Month view implementation
+                           ScreenState.MONTH -> {}
+                       }
                     }
                 }
             }
