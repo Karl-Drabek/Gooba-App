@@ -18,7 +18,9 @@ import kotlin.time.Instant
 fun getDateAndTimeAsString(instant: Instant = Clock.System.now()): DateTime {
     val systemTimeZone = TimeZone.currentSystemDefault()
     val dateAndTime = instant.toLocalDateTime(systemTimeZone)
-    val date = "${dateAndTime.year}-${dateAndTime.month.number}-${dateAndTime.day}"
+    val paddedMonth = dateAndTime.month.number.toString().padStart(2,'0')
+    val paddedDay = dateAndTime.day.toString().padStart(2, '0')
+    val date = "${dateAndTime.year}-${paddedMonth}-${paddedDay}"
     val time = "${dateAndTime.hour}:${dateAndTime.minute}:${dateAndTime.second}"
     return DateTime(date, time)
 }

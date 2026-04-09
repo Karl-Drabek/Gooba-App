@@ -121,19 +121,9 @@ fun DayOfTasks(
 ) {
     BoxWithConstraints(
         modifier = Modifier
-            .aspectRatio(1f) // Keep cells square
+            .fillMaxSize()
             .padding(4.dp)
     ) {
-        // Calculate a scale factor based on the smallest dimension
-        val sizePx = minOf(maxWidth, maxHeight)
-
-        // Define sizes as a percentage of the container
-        val iconSize = sizePx * 0.2f
-        val fontSize = sizePx.value * 0.15f
-        val headerFontSize = fontSize * 1.5f
-
-        // Spacing
-        val taskPadding = sizePx * 0.2f
 
         var cells : MutableList<CellConfig> = mutableListOf()
 
@@ -169,8 +159,7 @@ fun DayOfTasks(
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().padding(16.dp),
         ) {
 
             for (cell in cells) {
@@ -179,7 +168,7 @@ fun DayOfTasks(
                     modifier =
                         Modifier.
                             fillMaxWidth().
-                            padding(vertical = taskPadding),
+                            padding(vertical = 4.dp),
                 ){
 
                     // Task Name and Icon
@@ -192,10 +181,11 @@ fun DayOfTasks(
 
                             Icon(
                                 cell.icon,
-                                null,
-                                modifier = Modifier.size(iconSize)
+                                "Task",
+                                tint=Color.Yellow
                             )
 
+                            Spacer(Modifier.width(8.dp))
                         }
 
                         // TODO: Change conditional
@@ -205,7 +195,7 @@ fun DayOfTasks(
                                 text = cell.taskName,
                                 color = DarkText,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = headerFontSize.sp
+                                style = MaterialTheme.typography.titleLarge
                             )
 
                         }
@@ -219,10 +209,11 @@ fun DayOfTasks(
                         // TODO: Change Conditional
                         if(showUsers){
                             Text(
-                                text = "By ${cell.user}",
+                                text = "By ${cell.user} ",
                                 color = DarkText,
-                                fontSize = fontSize.sp
+                                style = MaterialTheme.typography.bodyMedium
                             )
+
                         }
 
                         // TODO: Change Conditional
@@ -230,8 +221,10 @@ fun DayOfTasks(
                             Text(
                                 text = "At: ${cell.time}",
                                 color = DarkText,
-                                fontSize = fontSize.sp
+                                style = MaterialTheme.typography.bodyMedium
                             )
+
+                            Spacer(Modifier.width(8.dp))
                         }
                     }
                 }
@@ -498,7 +491,6 @@ fun HistoryScreen(
                                    val dayOfTasks = monthOfTasks.filter {
                                        it.date.endsWith("$i")
                                    }
-
 
                                }
 

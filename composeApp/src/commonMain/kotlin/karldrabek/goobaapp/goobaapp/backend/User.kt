@@ -132,13 +132,11 @@ object UserRemoteManager : KoinComponent {
      *
      * @return the list of all users in the database. The list is empty if no such users exist. the result is null if there was an error in the query.
      */
-    suspend fun getAllUsers(): List<User>? {
+    suspend fun getAllUsers(): List<User> {
         val client: HttpClient by inject()
         val users: List<User> = client.get(GET_USERS_URL).body()
 
-        return users.ifEmpty {
-            null
-        }
+        return users
     }
 
     /**

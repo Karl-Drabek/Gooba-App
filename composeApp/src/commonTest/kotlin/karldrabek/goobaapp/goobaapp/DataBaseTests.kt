@@ -129,7 +129,6 @@ class DataBaseTests : KoinTest {
 
             // Verify there is a task on the DB
             tasksOnDB = taskRemoteManager.getAllTasks()
-            tasksOnDB!!
             assertTrue(!tasksOnDB.isEmpty(), message = "Get Tasks Test 2")
 
             // Get the task from the DB
