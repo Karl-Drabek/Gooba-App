@@ -37,8 +37,7 @@ fun LoadingScreen() {
         Card(
             modifier =
                 Modifier
-                    .padding(24.dp)
-                    .fillMaxWidth(),
+                    .padding(24.dp),
             shape = RoundedCornerShape(24.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         ) {

@@ -85,6 +85,7 @@ fun App(
                                 onOpenSettings = { viewModel.goTo(AppScreen.SETTINGS) },
                                 onOpenHistory = { viewModel.goTo(AppScreen.HISTORY) },
                                 users = state.users,
+                                tasks = state.tasks,
                             )
                         }
 

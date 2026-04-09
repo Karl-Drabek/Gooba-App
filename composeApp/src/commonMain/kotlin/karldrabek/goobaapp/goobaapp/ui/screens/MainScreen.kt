@@ -53,6 +53,7 @@ import karldrabek.goobaapp.goobaapp.ui.utils.DropDown
 import karldrabek.goobaapp.goobaapp.ui.utils.PopUp
 import karldrabek.goobaapp.goobaapp.ui.utils.TimeDropDown
 import karldrabek.goobaapp.goobaapp.utils.EventCompletedData
+import karldrabek.goobaapp.goobaapp.utils.TaskCompletionDay
 import karldrabek.goobaapp.goobaapp.utils.TaskType
 import karldrabek.goobaapp.goobaapp.utils.timeToText
 import karldrabek.goobaapp.goobaapp.utils.timeToValues
@@ -69,6 +70,7 @@ import kotlin.time.Clock
  *
  *  @param user the user currently logged in.
  *  @param users the list of all users.
+ *  @param tasks the task data for the day.
  *  @param registerTask called when a task is marked complete and sends the data to the database.
  *  @param updateTask called when an edit is saved and updates the task in the database.
  *  @param deleteTask called when a task is deleted and deletes the task in the database.
@@ -79,6 +81,7 @@ import kotlin.time.Clock
 fun MainScreen(
     user: User,
     users: List<User>,
+    tasks: TaskCompletionDay,
     registerTask: (Task) -> Unit,
     updateTask: (Task) -> Unit,
     deleteTask: (Task) -> Unit,
@@ -86,9 +89,9 @@ fun MainScreen(
     onOpenHistory: () -> Unit,
 ) {
     // State
-    var morningFoodData: EventCompletedData? by remember { mutableStateOf(null) }
-    var eveningFoodData: EventCompletedData? by remember { mutableStateOf(null) }
-    var poopScoopData: EventCompletedData? by remember { mutableStateOf(null) }
+    var morningFoodData: EventCompletedData? by remember { mutableStateOf(tasks.morning) }
+    var eveningFoodData: EventCompletedData? by remember { mutableStateOf(tasks.evening) }
+    var poopScoopData: EventCompletedData? by remember { mutableStateOf(tasks.poop) }
     var editTask: TaskType? by remember { mutableStateOf(null) }
 
     val editTaskConst: TaskType? = editTask
