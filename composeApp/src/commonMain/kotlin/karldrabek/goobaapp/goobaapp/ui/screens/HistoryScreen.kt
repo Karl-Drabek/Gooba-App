@@ -99,31 +99,49 @@ fun taskDateRange(
 
 }
 
+enum class ScreenState {
+    DAY,
+    WEEK,
+    MONTH
+}
 
-// TODO: Change from hard coded show to variable based on screen size
 /** Creates a calendar cell off of a list of tasks
  *
- * @param showIcons: Display icons
- * @param showUsers: Display users
- * @param showTimes: Display times
- * @param showTaskNames: Display Task name
+ * @param screenState: Current view state of the calendar
  * @param tasks: Tasks to display !!! MUST BE FOR SINGULAR DAY
  * @param users: Database users
  */
 @Composable
-fun DayOfTasks(
-    showIcons: Boolean = true,
-    showUsers: Boolean = true,
-    showTimes: Boolean = true,
-    showTaskNames: Boolean = true,
+fun CalendarView(
+    screenState: ScreenState,
     tasks: List<Task>,
     users: List<User>,
 ) {
+    var showTimes = false
+    var showTaskNames = false
+
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .padding(4.dp)
     ) {
+
+        when(screenState) {
+
+            ScreenState.DAY -> {
+                showTimes = true
+                showTaskNames = true
+            }
+
+            ScreenState.WEEK -> {
+                showTimes = true
+                showTaskNames = true
+            }
+
+            ScreenState.MONTH -> {
+            }
+
+        }
 
         var cells : MutableList<CellConfig> = mutableListOf()
 
@@ -153,7 +171,9 @@ fun DayOfTasks(
         }
 
         // TODO: Add a number and hline at the top of a calendar cell
-        fun calendarViewHeader(){
+        fun calendarViewHeader(
+            day: String
+        ){
 
         }
 
@@ -176,8 +196,6 @@ fun DayOfTasks(
                         modifier = Modifier.padding(2.dp),
                     ) {
 
-                        // TODO: Change conditional
-                        if(showIcons){
 
                             Icon(
                                 cell.icon,
@@ -186,7 +204,6 @@ fun DayOfTasks(
                             )
 
                             Spacer(Modifier.width(8.dp))
-                        }
 
                         // TODO: Change conditional
                         if(showTaskNames){
@@ -205,16 +222,12 @@ fun DayOfTasks(
                     Row(
                         modifier = Modifier.padding(2.dp),
                     ){
-
-                        // TODO: Change Conditional
-                        if(showUsers){
+                        
                             Text(
                                 text = "By ${cell.user} ",
                                 color = DarkText,
                                 style = MaterialTheme.typography.bodyMedium
                             )
-
-                        }
 
                         // TODO: Change Conditional
                         if(showTimes) {
@@ -234,11 +247,6 @@ fun DayOfTasks(
     }
 }
 
-enum class ScreenState {
-    DAY,
-    WEEK,
-    MONTH
-}
 @Composable
 fun HistoryScreen(
     users: List<User>,
@@ -269,7 +277,29 @@ fun HistoryScreen(
 
     //TODO
     @Composable
-    fun viewHeader() {
+    fun CalendarWindow(
+        title: String,
+        content: @Composable () -> Unit
+    ) {
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+
+            Text(
+                text = "$title View",
+                color = DarkText,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.headlineMedium
+            )
+
+            HorizontalDivider(thickness = 2.dp)
+
+            content()
+
+        }
 
     }
 
@@ -446,26 +476,15 @@ fun HistoryScreen(
                            // Day view implementation
                            ScreenState.DAY -> {
 
-                               Column(
-                                   modifier = Modifier.fillMaxWidth(),
-                                   horizontalAlignment = Alignment.CenterHorizontally,
-                                   verticalArrangement = Arrangement.spacedBy(16.dp),
-                               ) {
+                               val dayTasks: List<Task> = taskDateRange(selectedDate, selectedDate, tasks)
 
-                                   Text(
-                                       "Day View",
-                                       color = DarkText,
-                                       style = MaterialTheme.typography.headlineMedium,
-                                       fontWeight = FontWeight.Bold
-                                   )
-
-                                   HorizontalDivider(thickness = 2.dp)
-
-                                   val taskList = taskDateRange(selectedDate, selectedDate, tasks)
-
-                                   DayOfTasks(
-                                       tasks = taskList,
-                                       users = users
+                               CalendarWindow(
+                                   title="Day",
+                               ){
+                                   CalendarView(
+                                       ScreenState.DAY,
+                                       tasks=dayTasks,
+                                       users=users
                                    )
                                }
                            }
