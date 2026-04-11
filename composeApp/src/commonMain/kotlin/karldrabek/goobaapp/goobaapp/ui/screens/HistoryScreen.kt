@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import goobaapp.composeapp.generated.resources.Res
@@ -47,6 +48,9 @@ import karldrabek.goobaapp.goobaapp.utils.*
 import kotlinx.datetime.todayIn
 
 /** HISTORY CONFIG */
+
+val dividerThickness : Dp = 2.dp
+
 
 val todaysDate = Clock.System.todayIn(timeZone = TimeZone.UTC).toString()
 
@@ -116,6 +120,7 @@ fun CalendarView(
     screenState: ScreenState,
     tasks: List<Task>,
     users: List<User>,
+    dayNum: Int
 ) {
     var showTimes = false
     var showTaskNames = false
@@ -139,6 +144,7 @@ fun CalendarView(
             }
 
             ScreenState.MONTH -> {
+
             }
 
         }
@@ -170,13 +176,6 @@ fun CalendarView(
             }
         }
 
-        // TODO: Add a number and hline at the top of a calendar cell
-        fun calendarViewHeader(
-            day: String
-        ){
-
-        }
-
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -189,7 +188,17 @@ fun CalendarView(
                         Modifier.
                             fillMaxWidth().
                             padding(vertical = 4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                 ){
+
+                    // Number of the day
+                    Text(
+                        text = dayNum.toString(),
+                        fontWeight = FontWeight.Bold,
+                        style=MaterialTheme.typography.bodyMedium,
+                    )
+
+                    HorizontalDivider(thickness = dividerThickness)
 
                     // Task Name and Icon
                     Row(
@@ -275,7 +284,6 @@ fun HistoryScreen(
     // Create a format
     val datePickerFormat = remember { DatePickerDefaults.dateFormatter() }
 
-    //TODO
     @Composable
     fun CalendarWindow(
         title: String,
@@ -295,7 +303,7 @@ fun HistoryScreen(
                 style = MaterialTheme.typography.headlineMedium
             )
 
-            HorizontalDivider(thickness = 2.dp)
+            HorizontalDivider(thickness = dividerThickness)
 
             content()
 
@@ -431,7 +439,7 @@ fun HistoryScreen(
                         }
                     }
 
-                    HorizontalDivider(thickness = 2.dp)
+                    HorizontalDivider(thickness = dividerThickness)
 
                     if (showDateMenu) {
 
@@ -484,7 +492,8 @@ fun HistoryScreen(
                                    CalendarView(
                                        ScreenState.DAY,
                                        tasks=dayTasks,
-                                       users=users
+                                       users=users,
+                                       dayNum=selectedDate.takeLast(2).toInt()
                                    )
                                }
                            }
@@ -505,12 +514,50 @@ fun HistoryScreen(
                                    tasks = tasks
                                )
 
-                               for(i in 1..31){
+                               // Base window for the calendar to be displayed
+                               CalendarWindow (
+                                   title="Month"
+                               ) {
+                                   Column(
+                                       modifier = Modifier.fillMaxSize()
+                                   ) {
 
-                                   val dayOfTasks = monthOfTasks.filter {
-                                       it.date.endsWith("$i")
+                                       // 4 rows
+                                       for(i in 0..4) {
+
+                                           Row(
+                                               modifier = Modifier.fillMaxWidth(),
+                                           ) {
+
+                                               // 7 Days per week
+                                               for(j in 1..7) {
+
+                                                   if(i*7 + j > 31) break
+                                                   // Breaks between the cells
+                                                   VerticalDivider(thickness = dividerThickness)
+
+                                                   val dayOfTasks = monthOfTasks.filter {
+                                                       it.date.endsWith("${(i*7)+j}")
+                                                   }
+
+                                                   // Show this cell
+                                                   CalendarView(
+                                                       ScreenState.MONTH,
+                                                       tasks=dayOfTasks,
+                                                       users=users,
+                                                       dayNum= i * 7 + j
+                                                   )
+
+                                               }
+
+                                               // Fence posting for the lines
+                                               VerticalDivider(thickness = dividerThickness)
+                                           }
+
+                                           // Bottom line of the grid
+                                           HorizontalDivider(thickness = dividerThickness)
+                                       }
                                    }
-
                                }
 
                            }
