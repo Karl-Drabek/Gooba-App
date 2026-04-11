@@ -48,35 +48,26 @@ import karldrabek.goobaapp.goobaapp.utils.*
 import kotlinx.datetime.todayIn
 
 /** HISTORY CONFIG */
-
 val dividerThickness : Dp = 2.dp
-
-
 val todaysDate = Clock.System.todayIn(timeZone = TimeZone.UTC).toString()
-
 data class CellConfig(
-    val icon: ImageVector,
-    val taskName: String,
-    val user: User? = null,
-    val time: String? = null
+    val settings: Triple<ImageVector, String, Color>,
+    val user: User?,
+    val time: String
 )
 
-// Icons
-val morningIcon: ImageVector = Icons.Default.WbSunny
-val eveningIcon: ImageVector = Icons.Default.ModeNight
-val scoopIcon: ImageVector = Icons.Default.Pets
-
-// Text
-const val morningText: String = "Morning Food"
-const val eveningText: String = "Evening Food"
-const val scoopText: String = "Poop Scoop"
+// Settings are expected in Icon, Name, Color
+val morningSettings = Triple(Icons.Default.WbSunny, "Morning Food", Color.Yellow)
+val eveningSettings = Triple(Icons.Default.ModeNight, "Evening Food", Color.Blue)
+val scoopSettings = Triple(Icons.Default.Pets, "Scoop Food", Color.Gray)
 
 // pair list, order matters, can be done with a map in the future
-val taskPairs = listOf(
-    Pair(morningIcon, morningText),
-    Pair(eveningIcon, eveningText),
-    Pair(scoopIcon, scoopText)
+val taskSettings = listOf(
+    morningSettings,
+    eveningSettings,
+    scoopSettings,
 )
+
 /** ==================================================== */
 
 //TODO Luke
@@ -163,12 +154,10 @@ fun CalendarView(
 
         for(i in 0 until orderedTasks.size) {
             val task: Task? = orderedTasks[i]
-            val pair = taskPairs[i]
             if(task != null) {
                 cells.add(
                     CellConfig(
-                        icon=pair.first,
-                        taskName = pair.second,
+                        settings = taskSettings[i],
                         user = users.find { it.id == task.userID },
                         time = task.time
                     )
@@ -205,11 +194,10 @@ fun CalendarView(
                         modifier = Modifier.padding(2.dp),
                     ) {
 
-
                             Icon(
-                                cell.icon,
+                                cell.settings.first,
                                 "Task",
-                                tint=Color.Yellow
+                                tint=cell.settings.third
                             )
 
                             Spacer(Modifier.width(8.dp))
@@ -218,7 +206,7 @@ fun CalendarView(
                         if(showTaskNames){
 
                             Text(
-                                text = cell.taskName,
+                                text = cell.settings.second,
                                 color = DarkText,
                                 fontWeight = FontWeight.Bold,
                                 style = MaterialTheme.typography.titleLarge
