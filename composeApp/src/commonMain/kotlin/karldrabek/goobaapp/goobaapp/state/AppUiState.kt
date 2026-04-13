@@ -25,15 +25,15 @@ sealed class AppUiState {
 
     /** ready screens - any screen where the db data is loading and the user is logged in */
     data class Ready(
-        val currentScreen: AppScreen,
+        val currentScreen: AppReadScreen,
         val currentUser: User,
         val users: List<User>,
         val tasks: TaskCompletionDay,
     ) : AppUiState()
 
-    data class LoadingHistory(
-        val tasks: List<Task>,
+    data class History(
+        val tasks: List<Task>?,
         val users: List<User>,
-        val selectedDate: String
+        val selectedDate: String,
     ) : AppUiState()
 }

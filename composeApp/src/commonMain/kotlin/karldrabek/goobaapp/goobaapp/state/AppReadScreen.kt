@@ -3,8 +3,7 @@ package karldrabek.goobaapp.goobaapp.state
 /**
  * Stores the navigation state of the ui for the app
  */
-enum class AppScreen {
+enum class AppReadScreen {
     MAIN_MENU,
     SETTINGS,
-    HISTORY
 }

@@ -6,8 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import karldrabek.goobaapp.goobaapp.backend.networkModule
-import karldrabek.goobaapp.goobaapp.state.AppScreen
+import karldrabek.goobaapp.goobaapp.state.AppReadScreen
 import karldrabek.goobaapp.goobaapp.state.AppUiState
 import karldrabek.goobaapp.goobaapp.state.AppViewModel
 import karldrabek.goobaapp.goobaapp.ui.screens.EnterNameScreen
@@ -17,7 +16,9 @@ import karldrabek.goobaapp.goobaapp.ui.screens.LoadingScreen
 import karldrabek.goobaapp.goobaapp.ui.screens.MainScreen
 import karldrabek.goobaapp.goobaapp.ui.screens.SettingsScreen
 import karldrabek.goobaapp.goobaapp.ui.theme.GoobaTheme
-import org.koin.core.context.startKoin
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
 /**
  * Entry Point for Gooba App
@@ -72,12 +73,12 @@ fun App(
                     )
                 }
 
-                is AppUiState.LoadingHistory -> {
+                is AppUiState.History -> {
                     HistoryScreen(
                         users = state.users,
                         tasks = state.tasks,
                         chosenDate = state.selectedDate,
-                        onExit = { viewModel.goTo(AppScreen.MAIN_MENU) },
+                        onExit = { viewModel.goTo(AppReadScreen.MAIN_MENU) },
                         loadHistory = viewModel::loadHistory,
                     )
                 }
@@ -86,37 +87,31 @@ fun App(
                 is AppUiState.Ready -> {
                     when (state.currentScreen) {
                         // Main Menu Screen
-                        AppScreen.MAIN_MENU -> {
+                        AppReadScreen.MAIN_MENU -> {
                             MainScreen(
                                 state.currentUser,
                                 registerTask = { viewModel.registerTask(it) },
                                 updateTask = { viewModel.updateTask(it) },
                                 deleteTask = { viewModel.deleteTask(it) },
-                                onOpenSettings = { viewModel.goTo(AppScreen.SETTINGS) },
-                                onOpenHistory = { viewModel.goTo(AppScreen.HISTORY) },
+                                onOpenSettings = { viewModel.goTo(AppReadScreen.SETTINGS) },
+                                onOpenHistory = { viewModel.loadHistory(Clock.System.todayIn(timeZone = TimeZone.UTC).toString()) },
                                 users = state.users,
                                 tasks = state.tasks,
                             )
                         }
 
                         // Settings Screen
-                        AppScreen.SETTINGS -> {
+                        AppReadScreen.SETTINGS -> {
                             SettingsScreen(
                                 state.currentUser,
                                 state.users,
-                                onExit = { viewModel.goTo(AppScreen.MAIN_MENU) },
+                                onExit = { viewModel.goTo(AppReadScreen.MAIN_MENU) },
                                 onLogout = { viewModel.logout() },
                                 onDeleteUser = { viewModel.deleteCurrentUser() },
                                 onSaveClicked = {
                                     viewModel.updateUser(it)
                                 },
                             )
-                        }
-
-                        // History Screen
-                        AppScreen.HISTORY -> {
-                            // Looks dumb, see AppViewModel for Temp fix
-                            viewModel.goTo(AppScreen.HISTORY)
                         }
                     }
                 }

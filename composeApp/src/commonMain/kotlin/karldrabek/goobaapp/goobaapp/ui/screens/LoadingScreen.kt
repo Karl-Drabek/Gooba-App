@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import karldrabek.goobaapp.goobaapp.ui.utils.LoadingIndicator
 
 /**
  * Displays a loading screen with a moving loading circle and
@@ -41,28 +42,7 @@ fun LoadingScreen() {
             shape = RoundedCornerShape(24.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         ) {
-            // Display element top to bottom
-            Column(
-                modifier = Modifier.padding(32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(20.dp),
-            ) {
-                // Loading circle
-                CircularProgressIndicator()
-
-                // Loading Text
-                Text(
-                    text = "Loading...",
-                    style = MaterialTheme.typography.titleMedium,
-                )
-
-                // Stand by text
-                Text(
-                    text = "Please wait while we fetch your data",
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                )
-            }
+            LoadingIndicator()
         }
     }
 }

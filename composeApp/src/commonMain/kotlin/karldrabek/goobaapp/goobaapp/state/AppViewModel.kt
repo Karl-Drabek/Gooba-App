@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import karldrabek.goobaapp.goobaapp.backend.Task
 import karldrabek.goobaapp.goobaapp.backend.TaskRemoteManager
 import karldrabek.goobaapp.goobaapp.backend.User
@@ -19,10 +18,7 @@ import karldrabek.goobaapp.goobaapp.utils.textToTime
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 import kotlin.collections.plus
-import kotlin.time.Clock
 
 // TODO add specific screen requirements to parameters with appstate
 
@@ -126,7 +122,7 @@ class AppViewModel(
                             // If the user was found then we are logged in
                             if (savedUser != null) {
                                 AppUiState.Ready(
-                                    currentScreen = AppScreen.MAIN_MENU,
+                                    currentScreen = AppReadScreen.MAIN_MENU,
                                     currentUser = savedUser,
                                     users = users,
                                     tasks = taskCompletionDay,
@@ -198,7 +194,7 @@ class AppViewModel(
                     is AppUiState.NameEntry -> {
                         uiState =
                             AppUiState.Ready(
-                                currentScreen = AppScreen.MAIN_MENU,
+                                currentScreen = AppReadScreen.MAIN_MENU,
                                 currentUser = newUser,
                                 users = state.users + newUser,
                                 tasks = state.tasks,
@@ -210,7 +206,7 @@ class AppViewModel(
                         uiState =
                             state.copy(
                                 currentUser = newUser,
-                                currentScreen = AppScreen.MAIN_MENU,
+                                currentScreen = AppReadScreen.MAIN_MENU,
                                 users = state.users + newUser,
                             )
                     }
@@ -230,17 +226,9 @@ class AppViewModel(
      *
      * @param newScreen The AppScreen to switch to
      */
-    fun goTo(newScreen: AppScreen) {
+    fun goTo(newScreen: AppReadScreen) {
         val state = uiState
-        if (newScreen == AppScreen.HISTORY && state is AppUiState.Ready){ // Temporary fix
-
-            val todaysDate = Clock.System.todayIn(timeZone = TimeZone.UTC).toString()
-
-            loadHistory(
-                todaysDate
-            )
-
-        } else if (state is AppUiState.Ready) {
+        if (state is AppUiState.Ready) {
             uiState =
                 state.copy(
                     currentScreen = newScreen,
@@ -305,25 +293,29 @@ class AppViewModel(
      *
      * @param date date of tasks in YYYY-MM-DD
      */
-    fun loadHistory(
-        date: String
-    ) {
+    fun loadHistory(date: String) {
         viewModelScope.launch {
-
-            uiState = AppUiState.Loading
+            val state = uiState
+            if (state is AppUiState.Ready) {
+                uiState = AppUiState.History(tasks = null, users = state.users, selectedDate = date)
+            } else if (state is AppUiState.History) {
+                uiState = AppUiState.History(tasks = null, users = state.users, selectedDate = date)
+            }
 
             val (year, month, day) = date.split("-")
 
-            val tasks: List<Task>? = TaskRemoteManager.getMonthOfTasks(
-                year, month
-            )
+            val tasks: List<Task>? =
+                TaskRemoteManager.getMonthOfTasks(
+                    year,
+                    month,
+                )
 
-            val state = uiState
-
-            if(tasks == null) {
+            if (tasks == null) {
                 uiState = AppUiState.Error("Failed to update tasks")
             } else if (state is AppUiState.Ready) {
-                uiState = AppUiState.LoadingHistory(tasks = tasks, users = state.users, selectedDate = date)
+                uiState = AppUiState.History(tasks = tasks, users = state.users, selectedDate = date)
+            } else if (state is AppUiState.History) {
+                uiState = AppUiState.History(tasks = tasks, users = state.users, selectedDate = date)
             }
         }
     }
@@ -338,7 +330,6 @@ class AppViewModel(
     fun registerTask(task: Task) {
         viewModelScope.launch {
             try {
-
                 val successful = TaskRemoteManager.addTask(task)
 
                 val state = uiState
@@ -348,7 +339,6 @@ class AppViewModel(
                 } else if (state is AppUiState.Ready) {
                     updateStateForTask(task, state)
                 }
-
             } catch (e: Exception) {
                 uiState = AppUiState.Error("Failed to add task: ${e.message}")
             }
@@ -419,13 +409,13 @@ class AppViewModel(
             uiState =
                 state.copy(
                     currentUser = user,
-                    currentScreen = AppScreen.MAIN_MENU,
+                    currentScreen = AppReadScreen.MAIN_MENU,
                 )
         } else if (state is AppUiState.NameEntry) {
             uiState =
                 AppUiState.Ready(
                     currentUser = user,
-                    currentScreen = AppScreen.MAIN_MENU,
+                    currentScreen = AppReadScreen.MAIN_MENU,
                     users = state.users,
                     tasks = state.tasks,
                 )
