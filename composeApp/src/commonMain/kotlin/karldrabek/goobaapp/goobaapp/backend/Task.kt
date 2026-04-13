@@ -186,4 +186,24 @@ object TaskRemoteManager : KoinComponent {
             null
         }
     }
+
+    /**
+     * Retrieves a month of Tasks from the DB
+     *
+     * @param year Year number in YYYY
+     * @param month Month number in MM
+     * @return List of month of tasks
+     */
+    suspend fun getMonthOfTasks(year:String, month:String): List<Task>? {
+        val client: HttpClient by inject()
+
+        val response: HttpResponse = client.get(searchTasksByMonthUrl(year, month))
+
+        return if (response.status == HttpStatusCode.OK) {
+            response.body()
+        } else {
+            null
+        }
+    }
+
 }

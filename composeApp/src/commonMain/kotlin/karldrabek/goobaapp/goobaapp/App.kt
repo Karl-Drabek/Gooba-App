@@ -72,6 +72,16 @@ fun App(
                     )
                 }
 
+                is AppUiState.LoadingHistory -> {
+                    HistoryScreen(
+                        users = state.users,
+                        tasks = state.tasks,
+                        chosenDate = state.selectedDate,
+                        onExit = { viewModel.goTo(AppScreen.MAIN_MENU) },
+                        loadHistory = viewModel::loadHistory,
+                    )
+                }
+
                 // User is logged-in and we have pulled data from db
                 is AppUiState.Ready -> {
                     when (state.currentScreen) {
@@ -105,10 +115,8 @@ fun App(
 
                         // History Screen
                         AppScreen.HISTORY -> {
-                            HistoryScreen(
-                                users = state.users,
-                                onExit = { viewModel.goTo(AppScreen.MAIN_MENU) },
-                            )
+                            // Looks dumb, see AppViewModel for Temp fix
+                            viewModel.goTo(AppScreen.HISTORY)
                         }
                     }
                 }

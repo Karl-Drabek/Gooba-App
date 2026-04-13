@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import karldrabek.goobaapp.goobaapp.backend.Task
 import karldrabek.goobaapp.goobaapp.backend.TaskRemoteManager
 import karldrabek.goobaapp.goobaapp.backend.User
@@ -18,7 +19,10 @@ import karldrabek.goobaapp.goobaapp.utils.textToTime
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 import kotlin.collections.plus
+import kotlin.time.Clock
 
 // TODO add specific screen requirements to parameters with appstate
 
@@ -228,7 +232,15 @@ class AppViewModel(
      */
     fun goTo(newScreen: AppScreen) {
         val state = uiState
-        if (state is AppUiState.Ready) {
+        if (newScreen == AppScreen.HISTORY && state is AppUiState.Ready){ // Temporary fix
+
+            val todaysDate = Clock.System.todayIn(timeZone = TimeZone.UTC).toString()
+
+            loadHistory(
+                todaysDate
+            )
+
+        } else if (state is AppUiState.Ready) {
             uiState =
                 state.copy(
                     currentScreen = newScreen,
@@ -289,6 +301,34 @@ class AppViewModel(
     }
 
     /**
+     * Searches for a month of tasks on the database, switches to history context
+     *
+     * @param date date of tasks in YYYY-MM-DD
+     */
+    fun loadHistory(
+        date: String
+    ) {
+        viewModelScope.launch {
+
+            uiState = AppUiState.Loading
+
+            val (year, month, day) = date.split("-")
+
+            val tasks: List<Task>? = TaskRemoteManager.getMonthOfTasks(
+                year, month
+            )
+
+            val state = uiState
+
+            if(tasks == null) {
+                uiState = AppUiState.Error("Failed to update tasks")
+            } else if (state is AppUiState.Ready) {
+                uiState = AppUiState.LoadingHistory(tasks = tasks, users = state.users, selectedDate = date)
+            }
+        }
+    }
+
+    /**
      * Adds a new task to the database.
      * Make sure that a task with the same date and time does not already exist in the database.
      * Can switch to the error screen.
@@ -298,6 +338,7 @@ class AppViewModel(
     fun registerTask(task: Task) {
         viewModelScope.launch {
             try {
+
                 val successful = TaskRemoteManager.addTask(task)
 
                 val state = uiState
@@ -307,6 +348,7 @@ class AppViewModel(
                 } else if (state is AppUiState.Ready) {
                     updateStateForTask(task, state)
                 }
+
             } catch (e: Exception) {
                 uiState = AppUiState.Error("Failed to add task: ${e.message}")
             }

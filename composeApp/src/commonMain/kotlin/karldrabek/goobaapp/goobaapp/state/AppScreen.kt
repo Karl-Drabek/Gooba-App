@@ -6,5 +6,5 @@ package karldrabek.goobaapp.goobaapp.state
 enum class AppScreen {
     MAIN_MENU,
     SETTINGS,
-    HISTORY,
+    HISTORY
 }

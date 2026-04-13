@@ -72,8 +72,8 @@ val taskSettings = listOf(
  */
 fun taskDateRange(
     startDate: String,
-    endDate: String, tasks:
-    List<Task>
+    endDate: String,
+    tasks: List<Task>
 ): List<Task> {
 
     val start = LocalDate.parse(startDate)
@@ -236,11 +236,22 @@ fun CalendarView(
     }
 }
 
+/**
+ * Runs the History Screen
+ *
+ * @param users List of users on the app
+ * @param tasks List of tasks from the loaded month
+ * @param chosenDate Selected date to base view around
+ * @param onExit Exit lambda, should go to main screen
+ * @param loadHistory Reloads the history with the new date from a different month
+ */
 @Composable
 fun HistoryScreen(
-    users: List<User>,
     tasks: List<Task>,
+    users: List<User>,
+    chosenDate: String,
     onExit: () -> Unit,
+    loadHistory: (String) -> Unit
 ) {
 
     val menuWidth = 180f
@@ -252,9 +263,11 @@ fun HistoryScreen(
     // Start with Today's Date YYYY-MM-DD
     var selectedDate by rememberSaveable {
         mutableStateOf(
-            todaysDate
+            chosenDate
         )
     }
+
+    var loadedTasks by rememberSaveable { mutableStateOf(tasks) }
 
     var showDateMenu by rememberSaveable { mutableStateOf(false) }
 
@@ -431,7 +444,13 @@ fun HistoryScreen(
                                     .date
                                     .toString()
 
-                                selectedDate = date
+                                // Compare month and year
+                                if(date.take(6) != selectedDate.take(6)) {
+                                    loadHistory(date) // Relaunch history window with loaded tasks for new date
+                                } else {
+                                    selectedDate = date
+                                }
+
                             }
                         }
 
@@ -486,14 +505,6 @@ fun HistoryScreen(
                            // Month view implementation
                            ScreenState.MONTH -> {
 
-                               val (year, month, day) = selectedDate.split("-")
-
-                               val monthOfTasks = taskDateRange(
-                                   startDate = "$year-$month-01",
-                                   endDate = "$year-$month-31",
-                                   tasks = tasks
-                               )
-
                                // Base window for the calendar to be displayed
                                CalendarWindow (
                                    title="Month"
@@ -516,7 +527,7 @@ fun HistoryScreen(
                                                    // Breaks between the cells
                                                    VerticalDivider(thickness = dividerThickness)
 
-                                                   val dayOfTasks = monthOfTasks.filter {
+                                                   val dayOfTasks = tasks.filter {
                                                        it.date.endsWith("${(i*7)+j}")
                                                    }
 

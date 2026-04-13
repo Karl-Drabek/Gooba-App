@@ -16,7 +16,10 @@ import org.koin.dsl.module
 //const val LUKE_PUTER_IP =  "192.168.40.15"
 
 // Our House
-const val LUKE_PUTER_IP = "192.168.0.87"
+//const val LUKE_PUTER_IP = "192.168.0.87"
+
+// Luke school IP (Change when this doesnt work)
+const val LUKE_PUTER_IP ="172.20.10.2"
 
 /** search URLS for database calls */
 const val SERVER_URL = "http://$LUKE_PUTER_IP:1738"
@@ -56,6 +59,11 @@ fun searchTasksByTypeAndDateUrl(
     type: String,
     date: String,
 ) = "$SEARCH_TASK_URL/${date.encodeURLParameter()}/${type.encodeURLParameter()}"
+
+fun searchTasksByMonthUrl(
+    year: String,
+    month: String
+) = "$SEARCH_TASK_URL/${year.encodeURLParameter()}/${month.encodeURLParameter()}"
 
 val networkModule =
     module {

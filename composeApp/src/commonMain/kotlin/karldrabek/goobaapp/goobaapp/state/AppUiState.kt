@@ -1,5 +1,6 @@
 package karldrabek.goobaapp.goobaapp.state
 
+import karldrabek.goobaapp.goobaapp.backend.Task
 import karldrabek.goobaapp.goobaapp.backend.User
 import karldrabek.goobaapp.goobaapp.utils.TaskCompletionDay
 
@@ -28,5 +29,11 @@ sealed class AppUiState {
         val currentUser: User,
         val users: List<User>,
         val tasks: TaskCompletionDay,
+    ) : AppUiState()
+
+    data class LoadingHistory(
+        val tasks: List<Task>,
+        val users: List<User>,
+        val selectedDate: String
     ) : AppUiState()
 }
