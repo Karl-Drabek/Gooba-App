@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.ktor.client.request.invoke
 import karldrabek.goobaapp.goobaapp.backend.Task
 import karldrabek.goobaapp.goobaapp.backend.User
 import karldrabek.goobaapp.goobaapp.ui.theme.DarkText
@@ -56,6 +57,7 @@ import karldrabek.goobaapp.goobaapp.ui.utils.LoadingIndicator
 import karldrabek.goobaapp.goobaapp.utils.TaskType
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.YearMonth
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
@@ -70,7 +72,7 @@ val todaysDate = Clock.System.todayIn(timeZone = TimeZone.UTC).toString()
 data class CellConfig(
     val settings: Triple<ImageVector, String, Color>,
     val user: User?,
-    val time: String,
+    val time: String
 )
 
 // Settings are expected in Icon, Name, Color
@@ -88,10 +90,12 @@ val taskSettings =
 
 // TODO Luke
 
-/** Returns a list of tasks from a range of tasks between two dates, range is inclusive on both ends
+/** Returns a list of tasks from a range of tasks between two dates within the SAME month,
+ * range is inclusive on both ends
  *
  * @param startDate Date string to start at YYYY-MM-DD
  * @param endDate Date string to end at YYYY-MM-DD
+ * @param tasks List of tasks to sort through
  * @return List of tasks that fall within the range, empty if no tasks were found
  */
 fun taskDateRange(
@@ -100,7 +104,17 @@ fun taskDateRange(
     tasks: List<Task>,
 ): List<Task> {
     val start = LocalDate.parse(startDate)
-    val end = LocalDate.parse(endDate)
+
+    val (year, month, day) = endDate.split("-")
+    val daysInMonth = YearMonth(year.toInt(), month.toInt()).numberOfDays
+
+    var end: LocalDate
+
+    if(endDate.takeLast(2).toInt() <= daysInMonth) {
+        end = LocalDate.parse(endDate)
+    } else {
+        end = LocalDate.parse(endDate.dropLast(2) + daysInMonth.toString())
+    }
 
     return tasks.filter {
         val taskDate = LocalDate.parse(it.date)
