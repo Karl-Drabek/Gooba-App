@@ -16,28 +16,27 @@ import kotlin.time.Instant
  * @return Pair of a date and a time string
  */
 fun getDateAndTimeAsString(instant: Instant = Clock.System.now()): DateTime {
+
     val systemTimeZone = TimeZone.currentSystemDefault()
     val dateAndTime = instant.toLocalDateTime(systemTimeZone)
+
+    var hour: String
+    var amPm: String
+
+    if(dateAndTime.hour > 12){
+        hour = (dateAndTime.hour - 12).toString().padStart(2, '0')
+        amPm = "PM"
+    } else {
+        hour = (dateAndTime.hour).toString().padStart(2, '0')
+        amPm = "AM"
+    }
+
     val paddedMonth = dateAndTime.month.number.toString().padStart(2,'0')
     val paddedDay = dateAndTime.day.toString().padStart(2, '0')
     val date = "${dateAndTime.year}-${paddedMonth}-${paddedDay}"
-    val time = "${dateAndTime.hour}:${dateAndTime.minute}:${dateAndTime.second}"
+    val time = "${hour}:${dateAndTime.minute}:${dateAndTime.second} $amPm"
     return DateTime(date, time)
 }
-
-/**
- *
- * @param date
- * @param time
- * @return instant from that date and time
- */
-fun dateAndTimeStringToInstant(date : String, time : String): Instant {
-
-    val localDateTime = LocalDateTime.parse("${date}T${time}")
-    val timeZone = TimeZone.currentSystemDefault()
-    return localDateTime.toInstant(timeZone)
-}
-
 /**
  * puts the Instant into minute hour and AM/PM:
  *

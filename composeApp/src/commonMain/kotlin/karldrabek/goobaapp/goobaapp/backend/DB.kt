@@ -16,10 +16,10 @@ import org.koin.dsl.module
 //const val LUKE_PUTER_IP =  "192.168.40.15"
 
 // Our House
-const val LUKE_PUTER_IP = "192.168.0.87"
+//const val LUKE_PUTER_IP = "192.168.0.87"
 
 // Luke school IP (Change when this doesn't work)
-//const val LUKE_PUTER_IP ="172.20.10.2"
+const val LUKE_PUTER_IP ="10.19.249.95"
 
 /** search URLS for database calls */
 const val SERVER_URL = "http://$LUKE_PUTER_IP:1738"

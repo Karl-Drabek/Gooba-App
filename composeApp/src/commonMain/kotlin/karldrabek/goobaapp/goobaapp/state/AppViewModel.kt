@@ -214,6 +214,7 @@ class AppViewModel(
                     else -> {
                         uiState = AppUiState.Error("Unexpected App state for register user: $state")
                     }
+
                 }
             } catch (e: Exception) {
                 uiState = AppUiState.Error("Failed to register user: ${e.message}")

@@ -125,7 +125,7 @@ object UserRemoteManager : KoinComponent {
      */
     suspend fun clearAllUsers() {
         val client: HttpClient by inject()
-        client.get(CLEAR_USERS_URL)
+        client.delete(CLEAR_USERS_URL)
     }
 
     /** Returns all users that exist on the database
