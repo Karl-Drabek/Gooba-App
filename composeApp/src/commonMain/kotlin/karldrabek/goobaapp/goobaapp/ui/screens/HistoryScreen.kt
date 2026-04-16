@@ -195,6 +195,16 @@ fun CalendarView(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize().padding(16.dp),
         ) {
+
+            // Number of the day
+            Text(
+                text = dayNum.toString(),
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+
+            HorizontalDivider(thickness = dividerThickness)
+
             for (cell in cells) {
                 Column(
                     modifier =
@@ -203,14 +213,6 @@ fun CalendarView(
                             .padding(vertical = 4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    // Number of the day
-                    Text(
-                        text = dayNum.toString(),
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-
-                    HorizontalDivider(thickness = dividerThickness)
 
                     // Task Name and Icon
                     Row(
@@ -343,7 +345,10 @@ fun HistoryScreen(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconButton(onClick = onExit) {
+                IconButton(onClick = {
+                    println("Shits chopped buns")
+                    onExit()
+                }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                         contentDescription = "Back",
