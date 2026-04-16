@@ -58,12 +58,12 @@ fun searchTasksByDateUrl(date: String): String = "$SEARCH_TASK_URL/date/${date.e
 fun searchTasksByTypeAndDateUrl(
     type: String,
     date: String,
-) = "$SEARCH_TASK_URL/${date.encodeURLParameter()}/${type.encodeURLParameter()}"
+) = "$SEARCH_TASK_URL/date/${date.encodeURLParameter()}/${type.encodeURLParameter()}"
 
 fun searchTasksByMonthUrl(
     year: String,
     month: String
-) = "$SEARCH_TASK_URL/${year.encodeURLParameter()}/${month.encodeURLParameter()}"
+) = "$SEARCH_TASK_URL/month/${year.encodeURLParameter()}/${month.encodeURLParameter()}"
 
 val networkModule =
     module {
